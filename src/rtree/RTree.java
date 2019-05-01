@@ -31,15 +31,32 @@ public class RTree {
 	private Node chooseLeaf(float[][] r){
 		Node N = this.root;
 		while(!N.isLeaf){
-			int minorEnlargementIndex = checkEnlargement(r, N.childRectangles);
+			int minorEnlargementIndex = nRectangle.checkEnlargement(r, N.childRectangles);
 			//N = getNodeById(N.childIds[minorEnlargementIndex]);
 		}
 		return N;
 	}
 
+	private void adjustTree(Node l, Node ll){
+		return;
+	}
+
+	private Node[] splitNode(Node n){
+		Node[] as = {null, null};
+		return as;
+	}
+
 	public void insertRect(float[][] r) {
 		Node leaf = this.chooseLeaf(r);
-		return;
+		leaf.childRectangles.add(r);
+		leaf.childIds.add((long)-1);
+		if(leaf.childIds.size() > this.M){
+			Node[] splitNodes = splitNode(leaf);
+			this.adjustTree(splitNodes[0], splitNodes[1]);
+		}
+		else{
+			adjustTree(leaf, null);
+		}
 	}
 	
 	public boolean findRect(float[][] r) {
