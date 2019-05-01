@@ -15,7 +15,6 @@ public class nRectangle {
 		min_value = -1.0f * (float) Float.MAX_VALUE;
 		max_value = (float) Float.MAX_VALUE;
 	}
-	
 	/*
 	 * overlaps: Returns true if two rectangles overlap, false otherwise.
 	 * 
