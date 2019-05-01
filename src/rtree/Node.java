@@ -1,17 +1,21 @@
 package rtree;
 
-public class Node {
-	private boolean isLeaf;
-	private float[][] coords; 
-	private Node[] childs;
-	private int M;
+import java.io.Serializable;
+import java.util.ArrayList;
+
+public class Node implements Serializable{
+	public boolean isLeaf;
+	public float[][] coords; 
+	public ArrayList<Long> childs;
+	public ArrayList<float[][]> childDims;
+	public long parent;
+	public long myId;
 	
-	public Node(boolean isLeaf,float[][] coords, int M) {
+	public Node(boolean isLeaf,float[][] coords, long parent) {
 		this.isLeaf = isLeaf;
 		this.coords = coords;
-		if(!isLeaf) {
-			this.childs = new Node[M];
-		}
-		this.M = M;
+		this.childs = new ArrayList<Long>();
+		this.childDims = new ArrayList<float[][]>();
+		this.parent = parent;
 	}
 }
