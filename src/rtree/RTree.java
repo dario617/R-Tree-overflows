@@ -1,5 +1,6 @@
 package rtree;
 import rtree.Node;
+import util.nRectangle;
 
 public class RTree {
 	public enum OverflowMethod {LINEAR, QUADRATIC, GREENE, EXTRA_HEURISTIC}
@@ -26,9 +27,19 @@ public class RTree {
 		}
 		return new Node(true, coords, M);
 	}
-	
+
+	private Node chooseLeaf(float[][] r){
+		Node N = this.root;
+		while(!N.isLeaf){
+			int minorEnlargementIndex = checkEnlargement(r, N.childRectangles);
+			//N = getNodeById(N.childIds[minorEnlargementIndex]);
+		}
+		return N;
+	}
+
 	public void insertRect(float[][] r) {
-		
+		Node leaf = this.chooseLeaf(r);
+		return;
 	}
 	
 	public boolean findRect(float[][] r) {

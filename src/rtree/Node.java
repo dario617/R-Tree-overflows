@@ -6,8 +6,8 @@ import java.util.ArrayList;
 public class Node implements Serializable{
 	public boolean isLeaf;
 	public float[][] coords; 
-	public ArrayList<Long> childs;
-	public ArrayList<float[][]> childDims;
+	public ArrayList<Long> childIds;
+	public ArrayList<float[][]> childRectangles;
 	public long parent;
 	public long myId;
 	
