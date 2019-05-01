@@ -33,11 +33,21 @@ public class RTree {
 			coords[i][0] = Float.MIN_VALUE;
 			coords[i][1] = Float.MAX_VALUE;
 		}
-		return new Node(true, coords, 0);
+		return new Node(true, coords, M);
+	}
+
+	private Node chooseLeaf(float[][] r){
+		Node N = this.root;
+		while(!N.isLeaf){
+			int minorEnlargementIndex = checkEnlargement(r, N.childRectangles);
+			//N = getNodeById(N.childIds[minorEnlargementIndex]);
+		}
+		return N;
 	}
 
 	public void insertRect(float[][] r) {
-
+		Node leaf = this.chooseLeaf(r);
+		return;
 	}
 
 	/**
@@ -80,7 +90,7 @@ public class RTree {
 		}
 		return false;
 	}
-
+	
 	public boolean deleteRect(float[][] r) {
 		return true;
 	}
