@@ -42,7 +42,7 @@ public class nRectangle {
 	 */
 	
 	public static float[][] MBR(float[][] nRect1, float[][] nRect2){
-		ArrayList<float[][]> twoRects = new ArrayList();
+		ArrayList<float[][]> twoRects = new ArrayList<float[][]>();
 		twoRects.add(nRect1);
 		twoRects.add(nRect2);
 		return MBR(twoRects);
