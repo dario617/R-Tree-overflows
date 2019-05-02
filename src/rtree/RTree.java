@@ -28,6 +28,7 @@ public class RTree {
 		this.overflowMethod = o;
 	}
 
+	// TODO : Rework root initialization
 	private Node createRoot(int dims) {
 		float[][] coords = new float[dims][2];
 		for (int i = 0; i < dims; i++) {
