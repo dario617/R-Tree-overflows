@@ -45,25 +45,36 @@ public class RTree {
 		return N;
 	}
 
-	private void adjustTree(Node l, Node ll){
+	private static void adjustTree(Node l, Node ll){
 		return;
 	}
+
+	/**
+	 * Splits the given node using quadratic or linear split
+	 * @param n
+	 * @return
+	 */
 
 	private Node[] splitNode(Node n){
 		Node[] as = {null, null};
 		return as;
 	}
 
+	/**
+	 * Insert a rectangle in the RTree
+	 * @param r rectangle coordinates
+	 */
+
 	public void insertRect(float[][] r) {
-		Node leaf = this.chooseLeaf(r);
-		leaf.childRectangles.add(r);
-		leaf.childIds.add((long)-1);
-		if(leaf.childIds.size() > this.M){
-			Node[] splitNodes = splitNode(leaf);
+		Node leafNode = this.chooseLeaf(r);
+		leafNode.childRectangles.add(r);
+		leafNode.childIds.add((long)-1); //Agregamos una id -1 pues estamos en una hoja.
+		if(leafNode.childIds.size() > this.M){
+			Node[] splitNodes = splitNode(leafNode);
 			this.adjustTree(splitNodes[0], splitNodes[1]);
 		}
 		else{
-			adjustTree(leaf, null);
+			adjustTree(leafNode, null);
 		}
 	}
 
@@ -83,9 +94,9 @@ public class RTree {
 
 			while (!queue.isEmpty()) {
 				Node n = queue.poll();
-				for (int i = 0; i < n.childs.size(); i++) {
+				for (int i = 0; i < n.childIds.size(); i++) {
 					// Check if the dimensions fit inside
-					if (nRectangle.overlaps(r, n.childDims.get(i))) {
+					if (nRectangle.overlaps(r, n.childRectangles.get(i))) {
 
 						// If is leaf then it's not in memory
 						// We should just return it as a valid response
@@ -94,7 +105,7 @@ public class RTree {
 						}
 						// Ask for node to memory manager
 						try {
-							Node c = this.memManager.loadNode(n.childs.get(i));
+							Node c = this.memManager.loadNode(n.childIds.get(i));
 							// Add at the bottom
 							queue.add(c);
 						}catch (Exception e) {

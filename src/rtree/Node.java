@@ -14,8 +14,8 @@ public class Node implements Serializable {
 	public Node(boolean isLeaf, float[][] coords, long parent) {
 		this.isLeaf = isLeaf;
 		this.coords = coords;
-		this.childs = new ArrayList<Long>();
-		this.childDims = new ArrayList<float[][]>();
+		this.childIds = new ArrayList<Long>();
+		this.childRectangles = new ArrayList<float[][]>();
 		this.parent = parent;
 	}
 }
