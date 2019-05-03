@@ -27,8 +27,8 @@ public class nRectangle {
 			float lower_toCompare = Math.min(nRect2[i][0], nRect2[i][0] + nRect2[i][1]);
 			float upper_toCompare = Math.max(nRect2[i][0], nRect2[i][0] + nRect2[i][1]);
 			
-			overlaps = lower_bound <= lower_toCompare || lower_bound <= upper_toCompare
-					|| upper_bound >= lower_toCompare || upper_bound >= upper_toCompare;
+			overlaps = (lower_bound <= lower_toCompare && upper_bound >= lower_toCompare)
+					|| (upper_bound >= upper_toCompare && lower_bound <= upper_toCompare);
 					
 			if(overlaps) break;
 		}
