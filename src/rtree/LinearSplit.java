@@ -19,17 +19,12 @@ public class LinearSplit {
 		nodo.childRectangles.remove(seeds[1].getKey());
 		nodo.childIds.remove(seeds[0].getValue());
 		nodo.childIds.remove(seeds[1].getValue());		
-		Random randGen = new Random();
 		while(nodo.childRectangles.size()>m+1) {
-			// **** ESTA ES LA LOGICA DEL PICKNEXT
-			int randNum = randGen.nextInt(nodo.childRectangles.size());			
-			float[][] rect = nodo.childRectangles.get(randNum);
-			Long id = nodo.childIds.get(randNum);
-			//
-			brother_rectangles.add(rect);
-			brother_ids.add(id);
-			nodo.childRectangles.remove(randNum);
-			nodo.childIds.remove(randNum);					
+			Pair<float[][], Long> siguiente = pickNext(nodo);
+			brother_rectangles.add(siguiente.getKey());
+			brother_ids.add(siguiente.getValue());
+			nodo.childRectangles.remove(siguiente.getKey());
+			nodo.childIds.remove(siguiente.getValue());					
 		}		
 		nodo.childRectangles.add(seeds[0].getKey());
 		nodo.childIds.add(seeds[0].getValue());
@@ -42,14 +37,19 @@ public class LinearSplit {
 		Node[] output = {nodo, second};
 		return output;
 	}
-	private static Pair<float[][], Long> pickNext(int size){
-		//TODO: Move Logic Here
-		Random randGen = new Random();
-		return null;
+	private static Pair<float[][], Long> pickNext(Node nodo){
+		
+		Random randGen = new Random(); 
+		int randNum = randGen.nextInt(nodo.childRectangles.size());			
+		float[][] rect = nodo.childRectangles.get(randNum);
+		Long id = nodo.childIds.get(randNum);
+		return new Pair<float[][], Long>(rect, id);
 	}
 	
 	private static Pair<float[][],Long>[] pickSeeds(Node nodo){
-		//TODO: All
+		for(float[][] rect : nodo.childRectangles) {
+			
+		}
 		return null;
 	}
 }

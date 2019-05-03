@@ -30,4 +30,8 @@ public class Node implements Serializable {
 	public void recalculateMBR() {
 		this.coords = nRectangle.MBR(childRectangles);
 	}
+	
+	public void setMyID(Long newId) {
+		this.myId = newId;
+	}
 }
