@@ -1,5 +1,6 @@
 package util;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -15,7 +16,7 @@ import rtree.Node;
 public class MemoryManager {
 
 	private long createdNodes;
-	private int loadedNodes;
+	public int loadedNodes;
 	private HashMap<Long, Node> bufferedNodes;
 	private HashMap<Long, Boolean> nodeUpdated;
 	// Tree Maps sort a HashMap on a descending key value
@@ -38,10 +39,29 @@ public class MemoryManager {
 		this.loadedOn = new TreeMap<Long, Long>();
 	}
 
+	/**
+	 * Returns a valid ID for a new node
+	 * @return
+	 */
 	public long getNewId() {
 		return this.createdNodes++;
 	}
 
+	/**
+	 * Inserts node to the buffer and removes a node 
+	 * if there's not enough space
+	 * @param n Node
+	 */
+	public void insertNode(Node n) {
+		if(loadedNodes == maxBuffered) {
+			freeNode();
+		}
+		this.bufferedNodes.put(n.myId, n);
+		this.nodeUpdated.put(n.myId, false);
+		this.loadedOn.put(System.nanoTime(), n.myId);
+		loadedNodes++;
+	}
+	
 	public void saveNode(Node n) throws IOException {
 		saveNode(n, this.createdNodes);
 		this.createdNodes++;
@@ -89,6 +109,13 @@ public class MemoryManager {
 		return this.nodeUpdated.get(id);
 	}
 
+	/**
+	 * Loads node from memory or buffer
+	 * @param id of the Node
+	 * @return Node recovered from memory or buffer
+	 * @throws ClassNotFoundException
+	 * @throws IOException in case the caller asks for an unknown node 
+	 */
 	public Node loadNode(long id) throws ClassNotFoundException, IOException {
 		// Check if in buffer
 		if (this.bufferedNodes.containsKey(id)) {
@@ -111,11 +138,27 @@ public class MemoryManager {
 
 			this.bufferedNodes.put(id, n);
 			this.nodeUpdated.put(id, false);
-			this.loadedOn.put(System.currentTimeMillis(), id);
+			this.loadedOn.put(System.nanoTime(), id);
 			loadedNodes++;
 
 			return n;
 		}
 	}
 
+	/**
+	 * Delete node from secondary memory.
+	 * If Id is not found no error is thrown
+	 * @param id of the node to delete
+	 */
+	public void deleteNode(long id) {
+		String filename = this.nodeDir + id + this.fileExtension;
+		try {
+			File f = new File(filename);
+			if(!f.delete()) {
+				System.err.println("Coudn't delete file "+id);
+			}
+		}catch (Exception e) {
+			System.err.println("File not found");
+		}
+	}
 }

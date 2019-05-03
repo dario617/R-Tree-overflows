@@ -116,7 +116,6 @@ public class RTree {
 	 * @param n
 	 * @return
 	 */
-
 	private Node[] splitNode(Node n){
 		Node[] as = {null, null};
 		return as;
@@ -126,7 +125,6 @@ public class RTree {
 	 * Insert a rectangle in the RTree
 	 * @param r rectangle coordinates
 	 */
-
 	public void insertRect(float[][] r) {
 		Node leafNode = null;
 		try {
@@ -167,7 +165,6 @@ public class RTree {
 	/**
 	 * Search for a rectangle in the RTree and returns true if the exact rectangle
 	 * is in a leaf.
-	 * 
 	 * @param r rectangle coordinates
 	 * @return if the rectangle is in a leaf
 	 */
