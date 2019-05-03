@@ -36,7 +36,7 @@ public class RTree {
 			coords[i][0] = Float.MIN_VALUE;
 			coords[i][1] = Float.MAX_VALUE;
 		}
-		return new Node(true, coords, M);
+		return new Node(true, coords, -1);
 	}
 
 	/**
