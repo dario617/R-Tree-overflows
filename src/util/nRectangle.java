@@ -116,5 +116,12 @@ public class nRectangle {
 		
 		return saved_index;
 	}
-	
+
+	public static float enlargementArea(float[][] rect, ArrayList<float[][]> group){
+		float originalArea = area(MBR(group));
+		group.add(rect);
+		float newArea = area(MBR(group));
+		group.remove(rect);
+		return newArea - originalArea;
+	}
 }
