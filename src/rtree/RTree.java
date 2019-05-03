@@ -25,6 +25,7 @@ public class RTree {
 		this.M = M;
 		this.ndims = dims;
 		this.root = createRoot(dims);
+		this.root.setMyID(memManager.getNewId());
 		this.overflowMethod = o;
 	}
 
@@ -68,6 +69,7 @@ public class RTree {
 			if(ll != null){
 				// Generamos una nueva raíz
 				this.root = createRoot(this.ndims);
+				this.root.setMyID(l.myId);
 				// Referenciamos los nuevos nodos en la nueva raíz
 				this.root.childRectangles.add(l.coords);
 				this.root.childIds.add(l.myId);
@@ -76,6 +78,9 @@ public class RTree {
 				// Seteamos el padre de ambos nodos
 				l.parent = this.root.myId;
 				ll.parent = this.root.myId;
+				// Generamos nuevas IDs para los nodos nuevos
+				l.setMyID(this.memManager.getNewId());
+				ll.setMyID(this.memManager.getNewId());
 				// Actualizo el MBR de la raíz
 				this.root.recalculateMBR();
 				return;
@@ -91,10 +96,10 @@ public class RTree {
 			// Llamo al padre del nodo l
 			Node P = this.memManager.loadNode(l.parent);
 			int lIndex = P.childIds.indexOf(l.myId);
-			l.recalculateMBR();
-			P.childRectangles.set(lIndex, l.coords);
 			if(ll != null) {
 				// Hubo split de nodos, ambos vienen con su MBR ya calculado
+				P.childRectangles.set(lIndex, l.coords);
+				ll.setMyID(this.memManager.getNewId());
 				P.childRectangles.add(ll.coords);
 				P.childIds.add(ll.myId);
 				if (P.childIds.size() > this.M) {
@@ -104,6 +109,8 @@ public class RTree {
 				}
 			}
 			else{
+				l.recalculateMBR();
+				P.childRectangles.set(lIndex, l.coords);
 				P.recalculateMBR();
 				return;
 			}
