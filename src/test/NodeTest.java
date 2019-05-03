@@ -66,13 +66,20 @@ class NodeTest {
     void recalculateMBR() {
         assertEquals(r2, n.coords);
         n.childRectangles.add(r1);
+        n.childRectangles.add(r2);
         float[][] expected = nRectangle.MBR(r1, r2);
         assertNotEquals(expected, n.coords);
         n.recalculateMBR();
-        //assertEquals(expected, n.coords);
+        for(int i = 0; i<2; i++){
+            for(int j = 0; j<2; j++){
+                assertEquals(expected[i][j], n.coords[i][j]);
+            }
+        }
     }
 
     @Test
     void setMyID() {
+        n.setMyID(id1);
+        assertEquals(id1, n.myId);
     }
 }
