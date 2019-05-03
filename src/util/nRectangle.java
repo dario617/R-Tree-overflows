@@ -22,10 +22,10 @@ public class nRectangle {
 	public static boolean overlaps(float[][] nRect1, float[][] nRect2) {
 		boolean overlaps = false;
 		for(int i = 0; i<nRect1[0].length; i++) {
-			float lower_bound = Math.min(nRect1[i][0], nRect1[i][0] + nRect1[i][1]);
-			float upper_bound = Math.max(nRect1[i][0], nRect1[i][0] + nRect1[i][1]);
-			float lower_toCompare = Math.min(nRect2[i][0], nRect2[i][0] + nRect2[i][1]);
-			float upper_toCompare = Math.max(nRect2[i][0], nRect2[i][0] + nRect2[i][1]);
+			float lower_bound = Math.min(nRect1[0][i], nRect1[0][i] + nRect1[1][i]);
+			float upper_bound = Math.max(nRect1[0][i], nRect1[0][i] + nRect1[1][i]);
+			float lower_toCompare = Math.min(nRect2[0][i], nRect2[0][i] + nRect2[1][i]);
+			float upper_toCompare = Math.max(nRect2[0][i], nRect2[0][i] + nRect2[1][i]);
 			
 			overlaps = (lower_bound <= lower_toCompare && upper_bound >= lower_toCompare)
 					|| (upper_bound >= upper_toCompare && lower_bound <= upper_toCompare);
