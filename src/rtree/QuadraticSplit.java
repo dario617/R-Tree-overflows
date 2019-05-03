@@ -57,7 +57,7 @@ public class QuadraticSplit {
              max = diff;
             }
         }
-        Pair<float[][], Long> thePair = new Pair(theRect, theId);
+        Pair<float[][], Long> thePair = new Pair<float[][], Long>(theRect, theId);
         return thePair;
 
     }
