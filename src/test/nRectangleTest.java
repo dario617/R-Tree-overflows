@@ -46,6 +46,16 @@ class nRectangleTest {
 
     @org.junit.jupiter.api.Test
     void MBR1() {
+        ArrayList<float[][]> rects0 = new ArrayList<>();
+        rects0.add(r3);
+        rects0.add(r4);
+        float[][] mbr0 = nRectangle.MBR(rects0);
+        for(int i = 0; i<2; i++){
+            for(int j = 0; j<2; j++){
+                System.out.println(i+j);
+                assertEquals(mbr34[i][j], mbr0[i][j]);
+            }
+        }
         ArrayList<float[][]> rects = new ArrayList<>();
         rects.add(r0);
         rects.add(r1);
@@ -53,7 +63,7 @@ class nRectangleTest {
         float[][] mbr = nRectangle.MBR(rects);
         for(int i = 0; i<2; i++){
             for(int j = 0; j<2; j++){
-                assertEquals(mbr[i][j], mbr012[i][j]);
+                assertEquals(mbr012[i][j], mbr[i][j]);
             }
         }
 
