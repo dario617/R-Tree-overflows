@@ -55,22 +55,22 @@ public class nRectangle {
 		int mbr_len = nRects.get(0)[0].length;
 		float[][] coords = new float[mbr_len][2];
 		for(int i = 0; i<mbr_len; i++) {
-			coords[i][0] = min_coord;
-			coords[i][1] = max_coord;
+			coords[0][i] = min_coord;
+			coords[1][i] = max_coord;
 		}
 		
 		for(float[][] nRect : nRects) {
 			for(int i = 0; i<nRect[0].length; i++) {
-				float lower_bound = Math.min(nRect[i][0], nRect[i][0] + nRect[i][1]);
-				float upper_bound = Math.max(nRect[i][0], nRect[i][0] + nRect[i][1]);
-				coords[i][0] = Math.min(lower_bound, coords[i][0]);				
-				coords[i][1] = Math.max(upper_bound, coords[i][1]);
+				float lower_bound = Math.min(nRect[0][i], nRect[0][i] + nRect[1][i]);
+				float upper_bound = Math.max(nRect[0][i], nRect[0][i] + nRect[1][i]);
+				coords[0][i] = Math.min(lower_bound, coords[0][i]);				
+				coords[1][i] = Math.max(upper_bound, coords[1][i]);
 				
 			}
 		}
 		//transform into [coord, dim] system:
 		for(int i = 0; i<coords[0].length; i++) {
-			coords[i][1] -= coords[i][0];
+			coords[1][i] -= coords[0][i];
 		}
 		return coords;
 	}
