@@ -20,17 +20,18 @@ public class nRectangle {
 	 * 
 	 * */
 	public static boolean overlaps(float[][] nRect1, float[][] nRect2) {
-		boolean overlaps = false;
+		boolean overlaps = true;
 		for(int i = 0; i<nRect1[0].length; i++) {
 			float lower_bound = Math.min(nRect1[0][i], nRect1[0][i] + nRect1[1][i]);
 			float upper_bound = Math.max(nRect1[0][i], nRect1[0][i] + nRect1[1][i]);
 			float lower_toCompare = Math.min(nRect2[0][i], nRect2[0][i] + nRect2[1][i]);
 			float upper_toCompare = Math.max(nRect2[0][i], nRect2[0][i] + nRect2[1][i]);
 			
-			overlaps = (lower_bound <= lower_toCompare && upper_bound >= lower_toCompare)
+			boolean axis_overlaps = (lower_bound <= lower_toCompare && upper_bound >= lower_toCompare)
 					|| (upper_bound >= upper_toCompare && lower_bound <= upper_toCompare);
 					
-			if(overlaps) break;
+			overlaps = overlaps && axis_overlaps;
+			if(!overlaps) break;
 		}
 		return overlaps;
 	}
