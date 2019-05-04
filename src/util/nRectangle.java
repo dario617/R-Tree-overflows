@@ -45,7 +45,8 @@ public class nRectangle {
 		
 		//generate initial MBR with full length sides
 		int mbr_len = nRects.get(0)[0].length;
-		float[][] coords = new float[mbr_len][2];
+		System.out.println(mbr_len);
+		float[][] coords = new float[2][mbr_len];
 		for(int i = 0; i<mbr_len; i++) {
 			coords[0][i] = min_coord;
 			coords[1][i] = max_coord;
