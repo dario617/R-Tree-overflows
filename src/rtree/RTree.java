@@ -31,7 +31,7 @@ public class RTree {
 		this.overflowMethod = o;
 	}
 	// FUNCION PARA DEBUGUEAR, HAY QUE SACARLA DESPUES
-	public int sizeOfRoot(){
+	public int rootSize(){
 		return this.root.childRectangles.size();
 	}
 	
