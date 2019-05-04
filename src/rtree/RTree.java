@@ -30,6 +30,10 @@ public class RTree {
 		this.root.setMyID(memManager.getNewId());
 		this.overflowMethod = o;
 	}
+	// FUNCION PARA DEBUGUEAR, HAY QUE SACARLA DESPUES
+	public int sizeOfRoot(){
+		return this.root.childRectangles.size();
+	}
 	
 
 	public boolean isDebug() {
@@ -76,12 +80,12 @@ public class RTree {
 	private void adjustTree(Node l, Node ll) throws IOException, ClassNotFoundException {
 		assert(l!=null) : "Null pointer to first node to adjust!";
 		if(l == this.root){
-			// La raíz se partió en dos partes
+			// La raï¿½z se partiï¿½ en dos partes
 			if(ll != null){
-				// Generamos una nueva raíz
+				// Generamos una nueva raï¿½z
 				this.root = createRoot(this.ndims);
 				this.root.setMyID(l.myId);
-				// Referenciamos los nuevos nodos en la nueva raíz
+				// Referenciamos los nuevos nodos en la nueva raï¿½z
 				this.root.childRectangles.add(l.coords);
 				this.root.childIds.add(l.myId);
 				this.root.childRectangles.add(ll.coords);
@@ -95,13 +99,13 @@ public class RTree {
 				// Guardamos los nodos nuevos en el buffer
 				memManager.insertNode(l);
 				memManager.insertNode(ll);
-				// Actualizo el MBR de la raíz
+				// Actualizo el MBR de la raï¿½z
 				this.root.recalculateMBR();
 				return;
 
 			}
 			else{
-				// No hubo split de la raíz, solo se actualiza su MBR
+				// No hubo split de la raï¿½z, solo se actualiza su MBR
 				l.recalculateMBR();
 				return;
 			}
@@ -123,7 +127,7 @@ public class RTree {
 				P.childRectangles.add(ll.coords);
 				P.childIds.add(ll.myId);
 				if (P.childIds.size() > this.M) {
-					// El padre se llenó, hago split
+					// El padre se llenï¿½, hago split
 					Node[] parentSplits = splitNode(P);
 					this.adjustTree(parentSplits[0], parentSplits[1]);
 				}
