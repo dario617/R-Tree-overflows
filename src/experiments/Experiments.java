@@ -73,13 +73,15 @@ public class Experiments {
 	private static void synteticDataExperiment() {
 		RTree.OverflowMethod[] om = { OverflowMethod.LINEAR, OverflowMethod.QUADRATIC };
 		for (int o = 0; o < om.length; o++) {
-			for (int e = 9; e < 26; e++) {
+			System.out.print("Inserting with Method ");
+			System.out.println(OverflowMethod.values()[o]);
+			for (int e = 9; e < 10; e++) {
 				runSynteticExperiment((long) Math.pow(2, e), om[o], 400, 100);
 			}
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
 		// Instantiate experiment tools
 		dg = new DatasetGenerator(1, 100, 2);
 		// Start experiments

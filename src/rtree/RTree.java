@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import rtree.Node;
 import util.MemoryManager;
 import util.nRectangle;
-
+import rtree.LinearSplit;
 public class RTree {
 	public enum OverflowMethod {
 		LINEAR, QUADRATIC, GREENE, EXTRA_HEURISTIC
@@ -65,7 +65,7 @@ public class RTree {
 	 * @param ll
 	 */
 	private void adjustTree(Node l, Node ll) throws IOException, ClassNotFoundException {
-		assert(l != null) : "Null pointer to first node to adjust!";
+		assert(l!=null) : "Null pointer to first node to adjust!";
 		if(l == this.root){
 			// La raíz se partió en dos partes
 			if(ll != null){
@@ -96,6 +96,8 @@ public class RTree {
 		}
 		else{
 			// Llamo al padre del nodo l
+			System.out.println("hola");
+			System.out.println(l);
 			Node P = this.memManager.loadNode(l.parent);
 			int lIndex = P.childIds.indexOf(l.myId);
 			if(ll != null) {
@@ -126,8 +128,11 @@ public class RTree {
 	 * @return
 	 */
 	private Node[] splitNode(Node n){
-		Node[] as = {null, null};
-		return as;
+		if(this.overflowMethod.equals(OverflowMethod.LINEAR)) {
+			return LinearSplit.split(n, this.m);
+		} else {
+			return QuadraticSplit.split(n, this.m);
+		}		
 	}
 
 	/**
@@ -135,6 +140,16 @@ public class RTree {
 	 * @param r rectangle coordinates
 	 */
 	public void insertRect(float[][] r) {
+		System.out.print("inserting rect [[");
+		System.out.print(r[0][0]);
+		System.out.print(" , ");
+		System.out.print(r[0][1]);
+		System.out.print(" ],[ ");
+		System.out.print(r[1][0]);
+		System.out.print(" , ");
+		System.out.print(r[1][1]);
+		System.out.println(" ]]");
+
 		Node leafNode = null;
 		try {
 			leafNode = this.chooseLeaf(r);
@@ -151,8 +166,8 @@ public class RTree {
 		leafNode.childIds.add((long)-1); //Agregamos una id -1 pues estamos en una hoja.
 		//Si el nodo sobrepaso los M registros, hay que hacer split
 		if(leafNode.childIds.size() > this.M){
-			Node[] splitNodes = splitNode(leafNode);
-			try {
+			Node[] splitNodes = splitNode(leafNode);			
+			try {				
 				this.adjustTree(splitNodes[0], splitNodes[1]);
 			} catch (IOException e) {
 				e.printStackTrace();
