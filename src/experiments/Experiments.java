@@ -28,7 +28,7 @@ public class Experiments {
 			
 			
 			// Log on unique file
-			Logger logs = new Logger("./" + timeStamp + "SynteticData-2^" + exp + ".txt",
+			Logger logs = new Logger("./" + timeStamp + "-SynteticData-2^" + exp + ".txt",
 					"SynteticData-2^" + exp, overflow.toString());
 
 			long nbRectangles = (long)Math.pow(2, exp);
@@ -76,6 +76,9 @@ public class Experiments {
 			logs.startTest("Statistics");
 			for(long id = 0; id < rtree.memManager.createdNodes; id++) {
 				tmp = rtree.memManager.getFileSizeAndDelete(id);
+				if(tmp == 0) {
+					requiredSpace-=pageSize; // Due to error on id innecessary increase
+				}
 				if(tmp >= fullCriteria) {nbFullNodes++;}
 				totalSpaceUsed += tmp;
 			}

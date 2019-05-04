@@ -18,6 +18,7 @@ public class RTree {
 	private Node root;
 	private final OverflowMethod overflowMethod;
 	public MemoryManager memManager;
+	private boolean debug = true;
 
 	public RTree(int m, int M, int dims, OverflowMethod o, int maxbuffered) {
 		assert (m <= M / 2);
@@ -29,8 +30,16 @@ public class RTree {
 		this.root.setMyID(memManager.getNewId());
 		this.overflowMethod = o;
 	}
+	
 
-	// TODO : Rework root initialization
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
 	private Node createRoot(int dims) {
 		float[][] coords = new float[dims][2];
 		for (int i = 0; i < dims; i++) {
@@ -67,12 +76,12 @@ public class RTree {
 	private void adjustTree(Node l, Node ll) throws IOException, ClassNotFoundException {
 		assert(l!=null) : "Null pointer to first node to adjust!";
 		if(l == this.root){
-			// La raÃ­z se partiÃ³ en dos partes
+			// La raíz se partió en dos partes
 			if(ll != null){
-				// Generamos una nueva raÃ­z
+				// Generamos una nueva raíz
 				this.root = createRoot(this.ndims);
 				this.root.setMyID(l.myId);
-				// Referenciamos los nuevos nodos en la nueva raÃ­z
+				// Referenciamos los nuevos nodos en la nueva raíz
 				this.root.childRectangles.add(l.coords);
 				this.root.childIds.add(l.myId);
 				this.root.childRectangles.add(ll.coords);
@@ -86,19 +95,24 @@ public class RTree {
 				// Guardamos los nodos nuevos en el buffer
 				memManager.insertNode(l);
 				memManager.insertNode(ll);
-				// Actualizo el MBR de la raÃ­z
+				// Actualizo el MBR de la raíz
 				this.root.recalculateMBR();
 				return;
 
 			}
 			else{
-				// No hubo split de la raÃ­z, solo se actualiza su MBR
+				// No hubo split de la raíz, solo se actualiza su MBR
 				l.recalculateMBR();
 				return;
 			}
 		}
 		else{
 			// Llamo al padre del nodo l
+			if(debug) {
+				System.out.println("hola");
+				System.out.println(l);	
+			}
+			memManager.insertNode(l);
 			Node P = this.memManager.loadNode(l.parent);
 			int lIndex = P.childIds.indexOf(l.myId);
 			if(ll != null) {
@@ -109,7 +123,7 @@ public class RTree {
 				P.childRectangles.add(ll.coords);
 				P.childIds.add(ll.myId);
 				if (P.childIds.size() > this.M) {
-					// El padre se llenÃ³, hago split
+					// El padre se llenó, hago split
 					Node[] parentSplits = splitNode(P);
 					this.adjustTree(parentSplits[0], parentSplits[1]);
 				}
@@ -142,15 +156,17 @@ public class RTree {
 	 * @param r rectangle coordinates
 	 */
 	public void insertRect(float[][] r) {
-		System.out.print("inserting rect [[");
-		System.out.print(r[0][0]);
-		System.out.print(" , ");
-		System.out.print(r[0][1]);
-		System.out.print(" ],[ ");
-		System.out.print(r[1][0]);
-		System.out.print(" , ");
-		System.out.print(r[1][1]);
-		System.out.println(" ]]");
+		if(debug) {
+			System.out.print("inserting rect [[");
+			System.out.print(r[0][0]);
+			System.out.print(" , ");
+			System.out.print(r[0][1]);
+			System.out.print(" ],[ ");
+			System.out.print(r[1][0]);
+			System.out.print(" , ");
+			System.out.print(r[1][1]);
+			System.out.println(" ]]");			
+		}
 
 		Node leafNode = null;
 		try {
@@ -168,8 +184,8 @@ public class RTree {
 		leafNode.childIds.add((long)-1); //Agregamos una id -1 pues estamos en una hoja.
 		//Si el nodo sobrepaso los M registros, hay que hacer split
 		if(leafNode.childIds.size() > this.M){
-			Node[] splitNodes = splitNode(leafNode);			
-			try {				
+			Node[] splitNodes = splitNode(leafNode);
+			try {
 				this.adjustTree(splitNodes[0], splitNodes[1]);
 			} catch (IOException e) {
 				e.printStackTrace();
