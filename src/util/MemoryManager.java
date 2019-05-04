@@ -35,7 +35,7 @@ public class MemoryManager {
 	 * @param maxBufferedNodes
 	 */
 	public MemoryManager(int maxBufferedNodes) {
-		this.createdNodes = 0;
+		this.createdNodes = 1;
 		this.loadedNodes = 0;
 		this.maxBuffered = maxBufferedNodes;
 		this.bufferedNodes = new HashMap<Long, Node>();
