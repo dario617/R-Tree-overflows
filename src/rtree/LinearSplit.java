@@ -9,7 +9,7 @@ public class LinearSplit {
 	
 	
 	
-	public static Node[] split(Node nodo, int m, int rectangleDimensions){
+	public static Node[] split(Node nodo, int m){
 		ArrayList<float[][]> brother_rectangles = new ArrayList<float[][]>();
 		ArrayList<Long> brother_ids = new ArrayList<Long>();
 		ArrayList<Pair<float[][],Long>> seeds = pickSeeds(nodo);	
@@ -40,13 +40,13 @@ public class LinearSplit {
 	private static Pair<float[][], Long> pickNext(Node nodo){
 		
 		Random randGen = new Random(); 
-		int randNum = randGen.nextInt(nodo.childRectangles.size());			
+		int randNum = randGen.nextInt(nodo.childRectangles.size()-1);			
 		float[][] rect = nodo.childRectangles.get(randNum);
 		Long id = nodo.childIds.get(randNum);
 		return new Pair<float[][], Long>(rect, id);
 	}
 	
-	private static ArrayList<Pair<float[][],Long>> pickSeeds(Node nodo){
+	public static ArrayList<Pair<float[][],Long>> pickSeeds(Node nodo){
 		int dimension = nodo.childRectangles.get(0)[0].length;
 		//candidates are pairs with highest coeficient inner_distance/width.
 		float[][] candidateRect1 = {};
@@ -86,12 +86,12 @@ public class LinearSplit {
 				highest_side = Math.max(highest_side, high_side);	
 				counter++;
 			}
-			
 			if(Math.abs(HLS-LHS)/Math.abs(lowest_side-highest_side) > best_coefficient ) {
 				candidateRect1 = LHS_rect;
 				candidateRect2 = HLS_rect;
 				candidateId1 = LHS_childId;
 				candidateId2 = HLS_childId;
+				best_coefficient = Math.abs(HLS-LHS)/Math.abs(lowest_side-highest_side);
 			}
 		}
 		ArrayList<Pair<float[][], Long>> candidates = new ArrayList<Pair<float[][], Long>>();
