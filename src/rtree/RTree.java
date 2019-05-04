@@ -81,6 +81,10 @@ public class RTree {
 				// Generamos una nueva raíz
 				this.root = createRoot(this.ndims);
 				this.root.setMyID(l.myId);
+				this.root.isLeaf = false;
+				// Generamos nuevas IDs para los nodos nuevos
+				l.setMyID(this.memManager.getNewId());
+				ll.setMyID(this.memManager.getNewId());
 				// Referenciamos los nuevos nodos en la nueva raíz
 				this.root.childRectangles.add(l.coords);
 				this.root.childIds.add(l.myId);
@@ -89,9 +93,6 @@ public class RTree {
 				// Seteamos el padre de ambos nodos
 				l.parent = this.root.myId;
 				ll.parent = this.root.myId;
-				// Generamos nuevas IDs para los nodos nuevos
-				l.setMyID(this.memManager.getNewId());
-				ll.setMyID(this.memManager.getNewId());
 				// Guardamos los nodos nuevos en el buffer
 				memManager.insertNode(l);
 				memManager.insertNode(ll);
@@ -113,7 +114,12 @@ public class RTree {
 				System.out.println(l);	
 			}
 			memManager.insertNode(l);
-			Node P = this.memManager.loadNode(l.parent);
+			Node P;
+			if(l.parent == 0) {
+				P = this.root;
+			}else {
+				P = this.memManager.loadNode(l.parent);	
+			}
 			int lIndex = P.childIds.indexOf(l.myId);
 			if(ll != null) {
 				// Hubo split de nodos, ambos vienen con su MBR ya calculado
@@ -213,31 +219,29 @@ public class RTree {
 	public boolean search(float[][] r) {
 
 		// Search subtrees like a DFS
-		if (!this.root.isLeaf) {
-			LinkedList<Node> queue = new LinkedList<Node>();
-			queue.add(this.root);
+		LinkedList<Node> queue = new LinkedList<Node>();
+		queue.add(this.root);
 
-			while (!queue.isEmpty()) {
-				Node n = queue.poll();
-				for (int i = 0; i < n.childIds.size(); i++) {
-					// Check if the dimensions fit inside
-					if (nRectangle.overlaps(r, n.childRectangles.get(i))) {
+		while (!queue.isEmpty()) {
+			Node n = queue.poll();
+			for (int i = 0; i < n.childIds.size(); i++) {
+				// Check if the dimensions fit inside
+				if (nRectangle.overlaps(r, n.childRectangles.get(i))) {
 
-						// If is leaf then it's not in memory
-						// We should just return it as a valid response
-						if (n.isLeaf) {
-							return true;
-						}
-						// Ask for node to memory manager
-						try {
-							Node c = this.memManager.loadNode(n.childIds.get(i));
-							// Add at the bottom
-							queue.add(c);
-						}catch (Exception e) {
-							// TODO: handle exception
-						}
-						
+					// If is leaf then it's not in memory
+					// We should just return it as a valid response
+					if (n.isLeaf) {
+						return true;
 					}
+					// Ask for node to memory manager
+					try {
+						Node c = this.memManager.loadNode(n.childIds.get(i));
+						// Add at the bottom
+						queue.add(c);
+					}catch (Exception e) {
+						// TODO: handle exception
+					}
+					
 				}
 			}
 		}

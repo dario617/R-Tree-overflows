@@ -33,7 +33,7 @@ public class Experiments {
 
 			long nbRectangles = (long)Math.pow(2, exp);
 			
-			RTree rtree = new RTree(29, 73, 2, overflow, maxBuffered);
+			RTree rtree = new RTree(2, 3, 2, overflow, maxBuffered);
 			rtree.setDebug(DEBUG);
 			ArrayList<float[][]> cachedRect = new ArrayList<float[][]>();
 
@@ -100,7 +100,7 @@ public class Experiments {
 		for (int o = 0; o < om.length; o++) {
 			System.out.print("Inserting with Method ");
 			System.out.println(OverflowMethod.values()[o]);
-			for (int e = 9; e < 29; e++) {
+			for (int e = 9; e < 10; e++) {
 				runSynteticExperiment(e, om[o], 10, 100);
 			}
 		}
