@@ -3,18 +3,10 @@ package util;
 import java.util.ArrayList;
 
 public class nRectangle {
-	static float sum_epsilon;
-	static float prod_epsilon;
-	static float min_value;
-	static float max_value;
-	
-	private nRectangle() {
-		super();
-		sum_epsilon = 0.001f;
-		prod_epsilon = 1.001f;
-		min_value = -1.0f * (float) Float.MAX_VALUE;
-		max_value = (float) Float.MAX_VALUE;
-	}
+	static final float sum_epsilon = 0.001f;
+	static final float min_value = -1.0f * (float) Float.MAX_VALUE;
+	static final float max_value = (float) Float.MAX_VALUE;
+
 	/*
 	 * overlaps: Returns true if two rectangles overlap, false otherwise.
 	 * 
