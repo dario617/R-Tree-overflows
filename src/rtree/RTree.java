@@ -29,6 +29,8 @@ public class RTree {
 		this.memManager = new MemoryManager(maxbuffered);
 		this.root.setMyID(memManager.getNewId());
 		this.overflowMethod = o;
+		
+		this.memManager.insertNode(root);
 	}
 
 	// DEBUGGING FUNCTION HAY QUE BORRARLA
@@ -100,6 +102,7 @@ public class RTree {
 				// Guardamos los nodos nuevos en el buffer
 				memManager.insertNode(l);
 				memManager.insertNode(ll);
+				memManager.insertNode(root); // Tambien es nuevo
 				// Actualizo el MBR de la ra�z
 				this.root.recalculateMBR();
 				return;

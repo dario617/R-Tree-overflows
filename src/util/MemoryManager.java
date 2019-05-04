@@ -61,7 +61,7 @@ public class MemoryManager {
 	}
 	
 	public void insertNode(Node n, boolean freeString) {
-		if(loadedNodes == maxBuffered) {
+		if(!bufferedNodes.containsKey(n.myId) && loadedNodes == maxBuffered) {
 			freeNode(freeString);
 		}
 		this.bufferedNodes.put(n.myId, n);
