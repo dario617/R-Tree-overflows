@@ -163,19 +163,7 @@ public class MemoryManager {
 			}else {
 				n = loadFromMemory(id);
 			}
-
-			// Put node in buffer
-			// If buffer is full
-			if (loadedNodes == maxBuffered) {
-				// Select a random not modified node and delete it
-				freeNode(readString);
-			}
-
-			this.bufferedNodes.put(id, n);
-			this.nodeUpdated.put(id, false);
-			this.loadedOn.put(System.nanoTime(), id);
-			loadedNodes++;
-
+			insertNode(n, readString);
 			return n;
 		}
 	}
@@ -225,7 +213,6 @@ public class MemoryManager {
 		try {
 			File f = new File(filename);
 			long size = f.length();
-			System.out.println(size);
 			if(!f.delete()) {
 				System.err.println("Couldn't delete file "+id);
 			}
