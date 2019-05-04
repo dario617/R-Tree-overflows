@@ -1,9 +1,13 @@
 package util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -53,8 +57,12 @@ public class MemoryManager {
 	 * @param n Node
 	 */
 	public void insertNode(Node n) {
+		insertNode(n, false);
+	}
+	
+	public void insertNode(Node n, boolean freeString) {
 		if(loadedNodes == maxBuffered) {
-			freeNode();
+			freeNode(freeString);
 		}
 		this.bufferedNodes.put(n.myId, n);
 		this.nodeUpdated.put(n.myId, false);
@@ -65,6 +73,20 @@ public class MemoryManager {
 	public void saveNode(Node n) throws IOException {
 		saveNode(n, this.createdNodes);
 		this.createdNodes++;
+	}
+	
+	/**
+	 * Saves node string format to secondary memory
+	 * @param n Node to save
+	 * @throws IOException
+	 */
+	public void saveNodeAsString(Node n) throws IOException{
+		String s = n.toFileString();
+		String filename = this.nodeDir + n.myId + this.fileExtension;
+		BufferedWriter fos = new BufferedWriter(new FileWriter(filename));
+		fos.write(s);
+		fos.flush();
+		fos.close();
 	}
 
 	/**
@@ -84,12 +106,17 @@ public class MemoryManager {
 
 	/**
 	 * Remove the oldest node from buffer and save it to memory
+	 * @param useString to save instead of binary
 	 */
-	private void freeNode() {
+	private void freeNode(boolean useString) {
 		try {
 			Entry<Long, Long> oldestId = loadedOn.pollFirstEntry();
 			long id = oldestId.getValue();
-			saveNode(bufferedNodes.get(id), id);
+			if(useString) {
+				saveNodeAsString(bufferedNodes.get(id));
+			}else {
+				saveNode(bufferedNodes.get(id), id);
+			}
 			// Delete internal references
 			bufferedNodes.remove(id);
 			nodeUpdated.remove(id);
@@ -117,23 +144,36 @@ public class MemoryManager {
 	 * @throws IOException in case the caller asks for an unknown node 
 	 */
 	public Node loadNode(long id) throws ClassNotFoundException, IOException {
+		return this.loadNode(id, false);
+	}
+	
+	/**
+	 * Load node from memory or buffer
+	 * @param id of the Node
+	 * @param readString if the node is saved as a string
+	 * @return Node recovered from memory or buffer
+	 * @throws ClassNotFoundException
+	 * @throws IOException
+	 */
+	public Node loadNode(long id, boolean readString) throws ClassNotFoundException, IOException {
 		// Check if in buffer
 		if (this.bufferedNodes.containsKey(id)) {
 			return this.bufferedNodes.get(id);
-			// Look for it in secondary memory
+		// Look for it in secondary memory
 		} else {
 
-			String filename = this.nodeDir + id + this.fileExtension;
-			FileInputStream fis = new FileInputStream(filename);
-			ObjectInputStream ois = new ObjectInputStream(fis);
-			Node n = (Node) ois.readObject();
-			ois.close();
+			Node n;
+			if(readString) {
+				n = loadStringFromMemory(id);
+			}else {
+				n = loadFromMemory(id);
+			}
 
 			// Put node in buffer
 			// If buffer is full
 			if (loadedNodes == maxBuffered) {
 				// Select a random not modified node and delete it
-				freeNode();
+				freeNode(readString);
 			}
 
 			this.bufferedNodes.put(id, n);
@@ -143,6 +183,23 @@ public class MemoryManager {
 
 			return n;
 		}
+	}
+	
+	private Node loadStringFromMemory(long id) throws IOException {
+		String filename = this.nodeDir + id + this.fileExtension;
+		BufferedReader bf = new BufferedReader(new FileReader(filename));
+		String read = bf.readLine();
+		Node n = new Node(read);
+		return n;
+	}
+
+	private Node loadFromMemory(long id) throws IOException, ClassNotFoundException {
+		String filename = this.nodeDir + id + this.fileExtension;
+		FileInputStream fis = new FileInputStream(filename);
+		ObjectInputStream ois = new ObjectInputStream(fis);
+		Node n = (Node) ois.readObject();
+		ois.close();
+		return n;
 	}
 
 	/**

@@ -37,7 +37,7 @@ public class DatasetGenerator {
 			rect[i][0] = nbGenerator.nextFloat()*diff + lowerBound;
 			nextPoint = nbGenerator.nextFloat()*diff + lowerBound;
 			// Check that they are not the same point
-			while((nextPoint - rect[i][0]) != 0.0) {
+			while(nextPoint == rect[i][0]) {
 				nextPoint = nbGenerator.nextFloat()*diff + lowerBound;
 			}
 			rect[i][1] = nextPoint - rect[i][0];

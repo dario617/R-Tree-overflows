@@ -17,14 +17,15 @@ public class RTree {
 	private int ndims;
 	private Node root;
 	private final OverflowMethod overflowMethod;
-	private MemoryManager memManager;
+	public MemoryManager memManager;
 
-	public RTree(int m, int M, int dims, OverflowMethod o) {
+	public RTree(int m, int M, int dims, OverflowMethod o, int maxbuffered) {
 		assert (m <= M / 2);
 		this.m = m;
 		this.M = M;
 		this.ndims = dims;
 		this.root = createRoot(dims);
+		this.memManager = new MemoryManager(maxbuffered);
 		this.root.setMyID(memManager.getNewId());
 		this.overflowMethod = o;
 	}
@@ -33,8 +34,9 @@ public class RTree {
 	private Node createRoot(int dims) {
 		float[][] coords = new float[dims][2];
 		for (int i = 0; i < dims; i++) {
-			coords[i][0] = Float.MIN_VALUE;
-			coords[i][1] = Float.MAX_VALUE;
+			coords[i][0] = (float) (-1.0 * Math.sqrt(Float.MAX_VALUE));
+			// To escape overflow on max value
+			coords[i][1] = (float) (2.0 * Math.sqrt(Float.MAX_VALUE));
 		}
 		return new Node(true, coords, -1);
 	}
