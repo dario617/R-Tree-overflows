@@ -19,7 +19,7 @@ import rtree.Node;
 
 public class MemoryManager {
 
-	private long createdNodes;
+	public long createdNodes;
 	public int loadedNodes;
 	private HashMap<Long, Node> bufferedNodes;
 	private HashMap<Long, Boolean> nodeUpdated;
@@ -68,11 +68,6 @@ public class MemoryManager {
 		this.nodeUpdated.put(n.myId, false);
 		this.loadedOn.put(System.nanoTime(), n.myId);
 		loadedNodes++;
-	}
-	
-	public void saveNode(Node n) throws IOException {
-		saveNode(n, this.createdNodes);
-		this.createdNodes++;
 	}
 	
 	/**
@@ -217,5 +212,55 @@ public class MemoryManager {
 		}catch (Exception e) {
 			System.err.println("File not found");
 		}
+	}
+	
+	/**
+	 * Get File size and delete it.
+	 * Used for statistics and clean up.
+	 * @param id
+	 * @return number of bytes
+	 */
+	public long getFileSizeAndDelete(long id) {
+		String filename = this.nodeDir + id + this.fileExtension;
+		try {
+			File f = new File(filename);
+			long size = f.length();
+			System.out.println(size);
+			if(!f.delete()) {
+				System.err.println("Couldn't delete file "+id);
+			}
+			return size;
+		}catch (Exception e) {
+			System.err.println("File not found");
+			return 0L;
+		}
+	}
+	
+	/**
+	 * Print file size in a human readable way
+	 * @param id
+	 */
+	public void printFileSize(long id) {
+		String filename = this.nodeDir + id + this.fileExtension;
+		try {
+			File f = new File(filename);
+			System.out.println(getFileSizeBytes(f));
+			System.out.println(getFileSizeKiloBytes(f));
+			System.out.println(getFileSizeMegaBytes(f));
+		}catch (Exception e) {
+			System.err.println("File not found");
+		}
+	}
+	
+	private static String getFileSizeMegaBytes(File file) {
+		return (double) file.length() / (1024 * 1024) + " mb";
+	}
+	
+	private static String getFileSizeKiloBytes(File file) {
+		return (double) file.length() / 1024 + "  kb";
+	}
+
+	private static String getFileSizeBytes(File file) {
+		return file.length() + " bytes";
 	}
 }

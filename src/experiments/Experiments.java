@@ -42,11 +42,6 @@ public class Experiments {
 			}
 			logs.stopTest("InsertTest");
 
-			// ----- Get page average used space
-			logs.startTest("Statistics");
-
-			logs.stopTest("Statistics");
-
 			// ----- Search test
 			logs.startTest("Search");
 			// Negative results
@@ -63,10 +58,28 @@ public class Experiments {
 			}
 			logs.stopTest("PositiveResults");
 			logs.stopTest("Search");
+			
+			// ----- Get page average used space
+			long totalSpaceUsed = 0L;
+			long requiredSpace = 4096L*rtree.memManager.createdNodes; // Page size
+			long nbFullNodes = 0L; // Nodes close to pagesize
+			long tmp;
+			logs.startTest("Statistics");
+			for(long id = 0; id < rtree.memManager.createdNodes; id++) {
+				tmp = rtree.memManager.getFileSizeAndDelete(id);
+				if(tmp >= 4000L) {nbFullNodes++;}
+				totalSpaceUsed += tmp;
+			}
+			logs.logInfo("Statistics", "Total Data Size"+totalSpaceUsed);
+			logs.logInfo("Statistics", "Total Data Required Size"+requiredSpace);
+			logs.logInfo("Statistics", "Page use ratio "+ totalSpaceUsed*100L/requiredSpace);
+			logs.logInfo("Statistics", "Number of full nodes "+nbFullNodes);
+			logs.stopTest("Statistics");
 
 			logs.close();
 		} catch (IOException e) {
 			System.err.println("Failed to initiate logger");
+			e.printStackTrace();
 		}
 	}
 
