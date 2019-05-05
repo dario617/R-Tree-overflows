@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -22,7 +21,7 @@ public class MemoryManager {
 	public long createdNodes;
 	public int loadedNodes;
 	private HashMap<Long, Node> bufferedNodes;
-	private HashMap<Long, Boolean> nodeUpdated;
+	private HashMap<Long, Long> nodeUpdated;
 	// Tree Maps sort a HashMap on a descending key value
 	private TreeMap<Long, Long> loadedOn; 
 	private String nodeDir = "./Rtree/";
@@ -35,11 +34,11 @@ public class MemoryManager {
 	 * @param maxBufferedNodes
 	 */
 	public MemoryManager(int maxBufferedNodes) {
-		this.createdNodes = 0;
+		this.createdNodes = 1;
 		this.loadedNodes = 0;
 		this.maxBuffered = maxBufferedNodes;
 		this.bufferedNodes = new HashMap<Long, Node>();
-		this.nodeUpdated = new HashMap<Long, Boolean>();
+		this.nodeUpdated = new HashMap<Long, Long>();
 		this.loadedOn = new TreeMap<Long, Long>();
 	}
 
@@ -61,13 +60,25 @@ public class MemoryManager {
 	}
 	
 	public void insertNode(Node n, boolean freeString) {
-		if(loadedNodes == maxBuffered) {
-			freeNode(freeString);
+		if(bufferedNodes.containsKey(n.myId)){
+			// Put node and remove previous timestamp
+			this.bufferedNodes.put(n.myId, n);
+			long usedTS = this.nodeUpdated.get(n.myId);
+			this.loadedOn.remove(usedTS);
+			// Get a new timestamp and update value
+			long newTS = System.nanoTime();
+			this.loadedOn.put(newTS, n.myId);
+			this.nodeUpdated.put(n.myId,newTS);
+		}else {
+			if(loadedNodes == maxBuffered) {
+				freeNode(freeString);
+			}
+			this.bufferedNodes.put(n.myId, n);
+			long newTS = System.nanoTime();
+			this.loadedOn.put(newTS, n.myId);
+			this.nodeUpdated.put(n.myId,newTS);
+			loadedNodes++;
 		}
-		this.bufferedNodes.put(n.myId, n);
-		this.nodeUpdated.put(n.myId, false);
-		this.loadedOn.put(System.nanoTime(), n.myId);
-		loadedNodes++;
 	}
 	
 	/**
@@ -95,7 +106,6 @@ public class MemoryManager {
 		FileOutputStream fos = new FileOutputStream(filename);
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(n);
-		oos.flush();
 		oos.close();
 	}
 
@@ -106,6 +116,7 @@ public class MemoryManager {
 	private void freeNode(boolean useString) {
 		try {
 			Entry<Long, Long> oldestId = loadedOn.pollFirstEntry();
+			
 			long id = oldestId.getValue();
 			if(useString) {
 				saveNodeAsString(bufferedNodes.get(id));
@@ -121,14 +132,6 @@ public class MemoryManager {
 			// TODO: handle exception
 			System.err.println("Failed to save the oldest node");
 		}
-	}
-
-	public void updatedNode(long id) {
-		this.nodeUpdated.put(id, true);
-	}
-
-	public boolean nodeWasModified(long id) {
-		return this.nodeUpdated.get(id);
 	}
 
 	/**
@@ -151,6 +154,9 @@ public class MemoryManager {
 	 * @throws IOException
 	 */
 	public Node loadNode(long id, boolean readString) throws ClassNotFoundException, IOException {
+		if(id == 0L) {
+			System.err.println(" Hola");
+		}
 		// Check if in buffer
 		if (this.bufferedNodes.containsKey(id)) {
 			return this.bufferedNodes.get(id);
@@ -181,6 +187,10 @@ public class MemoryManager {
 		FileInputStream fis = new FileInputStream(filename);
 		ObjectInputStream ois = new ObjectInputStream(fis);
 		Node n = (Node) ois.readObject();
+		if(n == null) {
+			System.err.println("WTF OMG WTF");
+		}
+		fis.close();
 		ois.close();
 		return n;
 	}
