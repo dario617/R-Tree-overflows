@@ -18,7 +18,7 @@ public class RTree {
 	private Node root;
 	private final OverflowMethod overflowMethod;
 	public MemoryManager memManager;
-	private boolean debug = true;
+	private boolean debug = false;
 
 	public RTree(int m, int M, int dims, OverflowMethod o, int maxbuffered) {
 		assert (m <= M / 2);
@@ -81,15 +81,23 @@ public class RTree {
 	 */
 	private void adjustTree(Node l, Node ll) throws IOException, ClassNotFoundException {
 		assert(l!=null) : "Null pointer to first node to adjust!";
+		if(l.childIds.size() != l.childRectangles.size() ) {
+			System.err.println("Aca"); // Poner breakpoint aqui
+		}
+		if(ll != null){
+			if(ll.childIds.size() != ll.childRectangles.size() ) {
+				System.err.println("Aca"); // Poner breakpoint aqui
+			}
+		}
 		if(l == this.root){
 			// La ra�z se parti� en dos partes
 			if(ll != null){
 				// Generamos una nueva ra�z
 				this.root = createRoot(this.ndims);
-				this.root.setMyID(l.myId);
+				this.root.setMyID(this.memManager.getNewId()); // New id!!!
 				this.root.isLeaf = false;
 				// Generamos nuevas IDs para los nodos nuevos
-				l.setMyID(this.memManager.getNewId());
+				// l.setMyID(this.memManager.getNewId()); If we change this id lower references will die
 				ll.setMyID(this.memManager.getNewId());
 				// Referenciamos los nuevos nodos en la nueva ra�z
 				this.root.childRectangles.add(l.coords);
@@ -115,19 +123,12 @@ public class RTree {
 			}
 		}
 		else{
-			// Llamo al padre del nodo l
-			if(debug) {
-				System.out.println("hola");
-				System.out.println(l);	
-			}
 			memManager.insertNode(l);
-			Node P;
-			if(l.parent == 0) {
-				P = this.root;
-			}else {
-				P = this.memManager.loadNode(l.parent);	
-			}
+			Node P = this.memManager.loadNode(l.parent);	
 			int lIndex = P.childIds.indexOf(l.myId);
+			if(lIndex == -1) {
+				System.err.println("All is lost!");
+			}
 			if(ll != null) {
 				// Hubo split de nodos, ambos vienen con su MBR ya calculado
 				P.childRectangles.set(lIndex, l.coords);
@@ -139,6 +140,13 @@ public class RTree {
 					// El padre se llen�, hago split
 					Node[] parentSplits = splitNode(P);
 					this.adjustTree(parentSplits[0], parentSplits[1]);
+					// Modify the NN children parent id
+					Node childNode;
+					for(long childID : parentSplits[1].childIds) {
+						childNode = memManager.loadNode(childID);
+						childNode.parent = parentSplits[1].myId;
+					}
+					
 				}
 			}
 			else{
@@ -197,13 +205,15 @@ public class RTree {
 		leafNode.childIds.add((long)-1); //Agregamos una id -1 pues estamos en una hoja.
 		//Si el nodo sobrepaso los M registros, hay que hacer split
 		if(leafNode.childIds.size() > this.M){
-			Node[] splitNodes = splitNode(leafNode);
 			try {
+				Node[] splitNodes = splitNode(leafNode);
 				this.adjustTree(splitNodes[0], splitNodes[1]);
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace(); // Poner breakpoint aqui
 			}
 		}
 		else{
@@ -247,6 +257,7 @@ public class RTree {
 						queue.add(c);
 					}catch (Exception e) {
 						// TODO: handle exception
+						e.printStackTrace();
 					}
 					
 				}
