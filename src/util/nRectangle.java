@@ -20,7 +20,10 @@ public class nRectangle {
 			float upper_toCompare = Math.max(nRect2[0][i], nRect2[0][i] + nRect2[1][i]);
 			
 			boolean axis_overlaps = (lower_bound <= lower_toCompare && upper_bound >= lower_toCompare)
-					|| (upper_bound >= upper_toCompare && lower_bound <= upper_toCompare);
+					|| (upper_bound >= upper_toCompare && lower_bound <= upper_toCompare)
+					|| (lower_toCompare<=lower_bound && upper_toCompare >=upper_bound)
+					|| (lower_bound>=lower_toCompare && upper_bound<=lower_toCompare)
+					;
 					
 			overlaps = overlaps && axis_overlaps;
 			if(!overlaps) break;
