@@ -30,7 +30,7 @@ class RTreeTest {
         qTree.insertRect(r3);
         lTree = new RTree(1,3, 2, RTree.OverflowMethod.LINEAR, 10);
         lTree.insertRect(r1);
-        lTree.insertRect(r2);
+        //lTree.insertRect(r2);
         lTree.insertRect(r3);
     }
 
@@ -42,9 +42,9 @@ class RTreeTest {
 
     @Test
     void insertRectLinear() {
-        assertEquals(3, lTree.rootSize());
-        lTree.insertRect(r4);
         assertEquals(2, lTree.rootSize());
+        lTree.insertRect(r4);
+        assertEquals(3, lTree.rootSize());
         lTree.insertRect(r5);
         lTree.insertRect(r6);
         lTree.insertRect(r7);
@@ -54,18 +54,20 @@ class RTreeTest {
     @Test
     void searchLinear() {
         assertTrue(lTree.search(r1));
-        assertTrue(lTree.search(r2));
+        //assertTrue(lTree.search(r2));
         assertTrue(lTree.search(r3));
         assertFalse(lTree.search(r4));
         lTree.insertRect(r4);
-        lTree.insertRect(r5);
         lTree.insertRect(r6);
         assertTrue(lTree.search(r1));
         System.out.println("SEARCH R4 CON 6 NODOS");
         assertTrue(lTree.search(r4));
         System.out.println("SEARCH R6 CON 6 NODOS");
         assertTrue(lTree.search(r6));
+        lTree.printTree();
         assertFalse(lTree.search(r7));
+        lTree.insertRect(r5);
+        assertTrue(lTree.search(r7));
     }
 
     @Test
@@ -86,7 +88,6 @@ class RTreeTest {
         assertTrue(qTree.search(r3));
         assertFalse(qTree.search(r4));
         qTree.insertRect(r4);
-        qTree.insertRect(r5);
         qTree.insertRect(r6);
         assertTrue(qTree.search(r1));
         System.out.println("SEARCH R4 CON 6 NODOS");
@@ -94,5 +95,7 @@ class RTreeTest {
         System.out.println("SEARCH R6 CON 6 NODOS");
         assertTrue(qTree.search(r6));
         assertFalse(qTree.search(r7));
+        qTree.insertRect(r5);
+        assertTrue(qTree.search(r7));
     }
 }
