@@ -26,7 +26,7 @@ public class RTree {
 		this.M = M;
 		this.ndims = dims;
 		this.root = createRoot(dims);
-		this.memManager = new MemoryManager(0);
+		this.memManager = new MemoryManager(maxbuffered);
 		this.root.setMyID(memManager.getNewId());
 		memManager.insertNode(this.root);
 		this.overflowMethod = o;
@@ -78,11 +78,11 @@ public class RTree {
 	}
 
 	private Node createRoot(int dims) {
-		float[][] coords = new float[dims][2];
+		float[][] coords = new float[2][dims];
 		for (int i = 0; i < dims; i++) {
-			coords[i][0] = (float) (-1.0 * Math.sqrt(Float.MAX_VALUE));
+			coords[0][i] = (float) (-1.0 * Math.sqrt(Float.MAX_VALUE));
 			// To escape overflow on max value
-			coords[i][1] = (float) (2.0 * Math.sqrt(Float.MAX_VALUE));
+			coords[1][i] = (float) (2.0 * Math.sqrt(Float.MAX_VALUE));
 		}
 		return new Node(true, coords, -1);
 	}
@@ -273,24 +273,29 @@ public class RTree {
 		queue.add(this.root);
 		while (!queue.isEmpty()) {
 			Node n = queue.poll();
-			System.out.printf("Tamaño de rectangulos del nodo %d\n", n.childRectangles.size());
+			if(debug) {
+				System.out.printf("Tamaño de rectangulos del nodo %d\n", n.childRectangles.size());
+			}
 			for (int i = 0; i < n.childRectangles.size(); i++) {
 				// Check if the dimensions fit inside
-				System.out.print("Searching ");
-				for(int j = 0; j<2; j++){				
-					System.out.printf("[ %f %f ]\n", r[j][0], r[j][1]);
-				}
-				System.out.println("In Rect");
-				for(int j = 0; j<2; j++){
-					
-					System.out.printf("[ %f %f ]\n", n.childRectangles.get(i)[j][0], n.childRectangles.get(i)[j][1]);
+				if(debug) {
+					System.out.print("Searching ");
+					for(int j = 0; j<2; j++){				
+						System.out.printf("[ %f %f ]\n", r[j][0], r[j][1]);
+					}
+					System.out.println("In Rect");
+					for(int j = 0; j<2; j++){
+						System.out.printf("[ %f %f ]\n", n.childRectangles.get(i)[j][0], n.childRectangles.get(i)[j][1]);
+					}
 				}
 				if (nRectangle.overlaps(r, n.childRectangles.get(i))) {
 
 					// If is leaf then it's not in memory
 					// We should just return it as a valid response
 					if (n.isLeaf) {
-						System.out.println("found");
+						if(debug) {
+							System.out.println("found");
+						}
 						return true;
 					}
 					// Ask for node to memory manager
@@ -299,7 +304,9 @@ public class RTree {
 						//System.out.println("ayuda");
 						// Add at the bottom
 						queue.add(c);
-						System.out.println("Succesfully added to queue");
+						if(debug) {
+							System.out.println("Succesfully added to queue");	
+						}
 					} catch (Exception e) {
 						// TODO: handle exception						
 						System.out.println("Exception en search");
@@ -310,7 +317,9 @@ public class RTree {
 				}
 			}
 		}
-		System.out.println("Not Found");
+		if(debug) {
+			System.out.println("Not Found");	
+		}
 		return false;
 	}
 	

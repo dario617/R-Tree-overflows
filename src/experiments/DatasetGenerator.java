@@ -31,16 +31,16 @@ public class DatasetGenerator {
 	 */
 	public float[][] getNewRectangle(){
 		
-		float[][] rect = new float[nbDims][2];
+		float[][] rect = new float[2][nbDims];
 		float nextPoint;
 		for(int i = 0; i < this.nbDims; i++) {
-			rect[i][0] = nbGenerator.nextFloat()*diff + lowerBound;
+			rect[0][i] = nbGenerator.nextFloat()*diff + lowerBound;
 			nextPoint = nbGenerator.nextFloat()*diff + lowerBound;
 			// Check that they are not the same point
-			while(nextPoint == rect[i][0]) {
+			while(nextPoint == rect[0][i]) {
 				nextPoint = nbGenerator.nextFloat()*diff + lowerBound;
 			}
-			rect[i][1] = nextPoint - rect[i][0];
+			rect[1][i] = nextPoint - rect[0][i];
 		}
 		return rect;
 	}
