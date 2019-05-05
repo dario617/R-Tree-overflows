@@ -57,6 +57,7 @@ class RTreeTest {
         assertTrue(theTree.search(r1));
         System.out.println("SEARCH R4 CON 6 NODOS");
         assertTrue(theTree.search(r4));
+        System.out.println("SEARCH R6 CON 6 NODOS");
         assertTrue(theTree.search(r6));
         assertFalse(theTree.search(r7));
 
