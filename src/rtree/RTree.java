@@ -28,6 +28,7 @@ public class RTree {
 		this.root = createRoot(dims);
 		this.memManager = new MemoryManager(maxbuffered);
 		this.root.setMyID(memManager.getNewId());
+		memManager.insertNode(this.root);
 		this.overflowMethod = o;
 	}
 	// FUNCION PARA DEBUGUEAR, HAY QUE SACARLA DESPUES
@@ -80,12 +81,15 @@ public class RTree {
 	private void adjustTree(Node l, Node ll) throws IOException, ClassNotFoundException {
 		assert(l!=null) : "Null pointer to first node to adjust!";
 		if(l == this.root){
-			// La ra�z se parti� en dos partes
+			// La raiz se partio en dos partes
 			if(ll != null){
 				// Generamos una nueva ra�z
 				this.root = createRoot(this.ndims);
-				this.root.setMyID(l.myId);
-				// Referenciamos los nuevos nodos en la nueva ra�z
+				// Le damos una nueva ID a la raiz
+				this.root.setMyID(memManager.getNewId());
+				// Generamos una nueva ID para el nodo nuevo
+				ll.setMyID(this.memManager.getNewId());
+				// Referenciamos los nodos en la nueva raiz
 				this.root.childRectangles.add(l.coords);
 				this.root.childIds.add(l.myId);
 				this.root.childRectangles.add(ll.coords);
@@ -93,19 +97,21 @@ public class RTree {
 				// Seteamos el padre de ambos nodos
 				l.parent = this.root.myId;
 				ll.parent = this.root.myId;
-				// Generamos nuevas IDs para los nodos nuevos
-				l.setMyID(this.memManager.getNewId());
-				ll.setMyID(this.memManager.getNewId());
-				// Guardamos los nodos nuevos en el buffer
-				memManager.insertNode(l);
-				memManager.insertNode(ll);
-				// Actualizo el MBR de la ra�z
+				// Actualizamos el padre de los hijos del nuevo nodo
+				for(Long f : ll.childIds){
+					Node child = memManager.loadNode(f);
+					child.parent = ll.myId;
+				}
+				// Actualizo el MBR de la raiz
 				this.root.recalculateMBR();
+				// Guardamos los nodos nuevos en el buffer
+				memManager.insertNode(this.root);
+				memManager.insertNode(ll);
 				return;
 
 			}
 			else{
-				// No hubo split de la ra�z, solo se actualiza su MBR
+				// No hubo split de la raiz, solo se actualiza su MBR
 				l.recalculateMBR();
 				return;
 			}
@@ -116,21 +122,28 @@ public class RTree {
 				System.out.println("hola");
 				System.out.println(l);	
 			}
-			memManager.insertNode(l);
 			Node P = this.memManager.loadNode(l.parent);
 			int lIndex = P.childIds.indexOf(l.myId);
 			if(ll != null) {
 				// Hubo split de nodos, ambos vienen con su MBR ya calculado
-				P.childRectangles.set(lIndex, l.coords);
+				// Le damos un id al nodo nuevo
 				ll.setMyID(this.memManager.getNewId());
+				// Seteo el padre de los hijos del nuevo nodo
+				for(Long f : ll.childIds){
+					Node child = memManager.loadNode(f);
+					child.parent = ll.myId;
+				}
 				memManager.insertNode(ll);
+				P.childRectangles.set(lIndex, l.coords);
 				P.childRectangles.add(ll.coords);
 				P.childIds.add(ll.myId);
+				P.recalculateMBR();
 				if (P.childIds.size() > this.M) {
 					// El padre se llen�, hago split
 					Node[] parentSplits = splitNode(P);
 					this.adjustTree(parentSplits[0], parentSplits[1]);
 				}
+				return;
 			}
 			else{
 				l.recalculateMBR();
@@ -217,31 +230,36 @@ public class RTree {
 	public boolean search(float[][] r) {
 
 		// Search subtrees like a DFS
-		if (!this.root.isLeaf) {
-			LinkedList<Node> queue = new LinkedList<Node>();
-			queue.add(this.root);
 
-			while (!queue.isEmpty()) {
-				Node n = queue.poll();
-				for (int i = 0; i < n.childIds.size(); i++) {
-					// Check if the dimensions fit inside
-					if (nRectangle.overlaps(r, n.childRectangles.get(i))) {
+		LinkedList<Node> queue = new LinkedList<Node>();
+		queue.add(this.root);
+		while (!queue.isEmpty()) {
+			Node n = queue.poll();
+			System.out.printf("Tamaño de rectangulos del nodo %d\n", n.childRectangles.size());
+			for (int i = 0; i < n.childIds.size(); i++) {
+				// Check if the dimensions fit inside
+				System.out.println("Rect");
+				for(int j = 0; j<2; j++){
+					System.out.printf("[ %f %f ]\n", n.childRectangles.get(i)[i][0], n.childRectangles.get(i)[i][1]);
+				}
+				if (nRectangle.overlaps(r, n.childRectangles.get(i))) {
 
-						// If is leaf then it's not in memory
-						// We should just return it as a valid response
-						if (n.isLeaf) {
-							return true;
-						}
-						// Ask for node to memory manager
-						try {
-							Node c = this.memManager.loadNode(n.childIds.get(i));
-							// Add at the bottom
-							queue.add(c);
-						}catch (Exception e) {
-							// TODO: handle exception
-						}
-						
+					// If is leaf then it's not in memory
+					// We should just return it as a valid response
+					if (n.isLeaf) {
+						return true;
 					}
+					// Ask for node to memory manager
+					try {
+						Node c = this.memManager.loadNode(n.childIds.get(i));
+						System.out.println("ayuda");
+						// Add at the bottom
+						queue.add(c);
+					} catch (Exception e) {
+						// TODO: handle exception
+						System.out.println("Exception en search");
+					}
+
 				}
 			}
 		}
