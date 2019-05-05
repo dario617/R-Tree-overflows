@@ -80,8 +80,8 @@ public class QuadraticSplit {
         g1Ids.add(seeds.get(0).getValue());
         g2Rects.add(seeds.get(1).getKey());
         g2Ids.add(seeds.get(1).getValue());
-        n.childRectangles.remove(seeds.get(0).getKey());
-        n.childRectangles.remove(seeds.get(1).getKey());
+        n.childRectangles.remove(n.childIds.indexOf(seeds.get(0).getValue()));
+        n.childRectangles.remove(n.childIds.indexOf(seeds.get(1).getValue()));
         n.childIds.remove(seeds.get(0).getValue());
         n.childIds.remove(seeds.get(1).getValue());
         while(n.childIds.size() > 0){
@@ -106,7 +106,7 @@ public class QuadraticSplit {
             }
             else {
                 Pair<float[][], Long> next = pickNext(n, g1Rects, g2Rects);
-                n.childRectangles.remove(next.getKey());
+                n.childRectangles.remove(n.childIds.indexOf(next.getValue()));
                 n.childIds.remove(next.getValue());
                 float area1 = nRectangle.area(nRectangle.MBR(g1Rects));
                 float area2 = nRectangle.area(nRectangle.MBR(g2Rects));
@@ -129,7 +129,7 @@ public class QuadraticSplit {
         newNode.childIds = g2Ids;
         newNode.recalculateMBR();
         n.childRectangles = g1Rects;
-        n.childIds = g2Ids;
+        n.childIds = g1Ids;
         n.recalculateMBR();
         Node[] nodes = {n, newNode};
         return nodes;

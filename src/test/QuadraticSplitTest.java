@@ -112,6 +112,8 @@ class QuadraticSplitTest {
         Node [] nodes = QuadraticSplit.split(this.n, 4);
         Node n1 = nodes[0];
         Node n2 = nodes[1];
+        assertEquals(n2.childIds.size(), n2.childRectangles.size());
+        assertEquals(n1.childIds.size(), n1.childRectangles.size());
         System.out.println(n1.childRectangles.size());
         System.out.println(n2.childRectangles.size());
     }
