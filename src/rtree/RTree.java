@@ -26,7 +26,7 @@ public class RTree {
 		this.M = M;
 		this.ndims = dims;
 		this.root = createRoot(dims);
-		this.memManager = new MemoryManager(maxbuffered);
+		this.memManager = new MemoryManager(0);
 		this.root.setMyID(memManager.getNewId());
 		memManager.insertNode(this.root);
 		this.overflowMethod = o;
@@ -85,6 +85,7 @@ public class RTree {
 			if(ll != null){
 				// Generamos una nueva ra�z
 				this.root = createRoot(this.ndims);
+				this.root.isLeaf=false;
 				// Le damos una nueva ID a la raiz
 				this.root.setMyID(memManager.getNewId());
 				// Generamos una nueva ID para el nodo nuevo
@@ -107,6 +108,7 @@ public class RTree {
 				// Guardamos los nodos nuevos en el buffer
 				memManager.insertNode(this.root);
 				memManager.insertNode(ll);
+				
 				return;
 
 			}
@@ -198,7 +200,7 @@ public class RTree {
 			return;
 		}
 		leafNode.childRectangles.add(r);
-		leafNode.childIds.add((long)-1); //Agregamos una id -1 pues estamos en una hoja.
+		leafNode.childIds.add(new Long(-1)); //Agregamos una id -1 pues estamos en una hoja.
 		//Si el nodo sobrepaso los M registros, hay que hacer split
 		if(leafNode.childIds.size() > this.M){
 			Node[] splitNodes = splitNode(leafNode);
@@ -236,33 +238,43 @@ public class RTree {
 		while (!queue.isEmpty()) {
 			Node n = queue.poll();
 			System.out.printf("Tamaño de rectangulos del nodo %d\n", n.childRectangles.size());
-			for (int i = 0; i < n.childIds.size(); i++) {
+			for (int i = 0; i < n.childRectangles.size(); i++) {
 				// Check if the dimensions fit inside
-				System.out.println("Rect");
+				System.out.print("Searching ");
+				for(int j = 0; j<2; j++){				
+					System.out.printf("[ %f %f ]\n", r[j][0], r[j][1]);
+				}
+				System.out.println("In Rect");
 				for(int j = 0; j<2; j++){
-					System.out.printf("[ %f %f ]\n", n.childRectangles.get(i)[i][0], n.childRectangles.get(i)[i][1]);
+					
+					System.out.printf("[ %f %f ]\n", n.childRectangles.get(i)[j][0], n.childRectangles.get(i)[j][1]);
 				}
 				if (nRectangle.overlaps(r, n.childRectangles.get(i))) {
 
 					// If is leaf then it's not in memory
 					// We should just return it as a valid response
 					if (n.isLeaf) {
+						System.out.println("found");
 						return true;
 					}
 					// Ask for node to memory manager
 					try {
 						Node c = this.memManager.loadNode(n.childIds.get(i));
-						System.out.println("ayuda");
+						//System.out.println("ayuda");
 						// Add at the bottom
 						queue.add(c);
+						System.out.println("Succesfully added to queue");
 					} catch (Exception e) {
-						// TODO: handle exception
+						// TODO: handle exception						
 						System.out.println("Exception en search");
+						e.printStackTrace();
+						System.out.println("=============================================");
 					}
 
 				}
 			}
 		}
+		System.out.println("Not Found");
 		return false;
 	}
 	
