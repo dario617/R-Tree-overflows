@@ -40,7 +40,7 @@ public class LinearSplit {
 	private static Pair<float[][], Long> pickNext(Node nodo){
 		
 		Random randGen = new Random(); 
-		int randNum = randGen.nextInt(nodo.childRectangles.size()-1);			
+		int randNum = randGen.nextInt(nodo.childIds.size()-1);			
 		float[][] rect = nodo.childRectangles.get(randNum);
 		Long id = nodo.childIds.get(randNum);
 		return new Pair<float[][], Long>(rect, id);
