@@ -35,7 +35,39 @@ public class RTree {
 	public int rootSize(){
 		return this.root.childRectangles.size();
 	}
-	
+
+	// DEBUGGING FUNCTION
+	public void printTree(){
+		LinkedList<Node> queue = new LinkedList<Node>();
+		queue.add(this.root);
+		int counter = 1;
+		while(!queue.isEmpty()){
+			Node node = queue.poll();
+			System.out.println("==============");
+			System.out.printf("Numero de nodo: %d\n", counter++);
+			System.out.printf("ID: %d, Parent: %d\n", node.myId, node.parent);
+			System.out.printf("childIds: %d, childRects: %d\n", node.childIds.size(), node.childRectangles.size());
+			System.out.printf("isLeaf: %s\n", node.isLeaf);
+			System.out.println("MBR:");
+			for(int j = 0; j < this.ndims; j++){
+				System.out.printf("[%f\t%f]\n",node.coords[j][0], node.coords[j][1]);
+			}
+			System.out.println("==============");
+			if(node.isLeaf){
+				continue;
+			}
+			for(int i = 0; i < node.childIds.size(); i++){
+				try {
+					Node n = this.memManager.loadNode(node.childIds.get(i));
+					queue.add(n);
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 
 	public boolean isDebug() {
 		return debug;
