@@ -15,6 +15,9 @@ class nRectangleTest {
     float [][] r4 = {{4,0}, {3,3}};
     float [][] mbr34 = {{1,0}, {6,3}};
     float [][] mbr012 = {{0,0}, {2,2}};
+    float [][] ra = {{1,1}, {1,1}};
+    float [][] rb = {{3,1}, {2,3}};
+    float [][] rc = {{1,5}, {1,2}};
 
     @org.junit.jupiter.api.BeforeEach
     void setUp() {
@@ -70,6 +73,9 @@ class nRectangleTest {
 
     @org.junit.jupiter.api.Test
     void area() {
+        assertEquals(1, nRectangle.area(ra));
+        assertEquals(6, nRectangle.area(rb));
+        assertEquals(2, nRectangle.area(rc));
     }
 
     @org.junit.jupiter.api.Test

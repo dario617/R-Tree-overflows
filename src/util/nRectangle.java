@@ -73,7 +73,7 @@ public class nRectangle {
 	public static float area(float[][] nRect) {
 		float accumulator = 1;
 		for(int i=0; i<nRect[1].length; i++) {
-			accumulator *= Math.abs(nRect[i][1]);
+			accumulator *= Math.abs(nRect[1][i]);
 		}
 		return accumulator;
 	}

@@ -10,16 +10,23 @@ import static java.lang.Math.abs;
 
 
 public class QuadraticSplit {
-    private static List<Pair<float[][], Long>> pickSeeds(Node n){
+    /**
+     * Selecciona los dos primeros nodos para el quadratic split. Los entrega como pares rectangulo, id
+     * @param n Nodo a splittear
+     * @return Lista de dos pares rectangulo, id
+     */
+    public static List<Pair<float[][], Long>> pickSeeds(Node n){
         float[][] rect1 = null;
         Long id1 = null;
         float[][] rect2 = null;
         Long id2 = null;
         float d;
         float max = -1;
-        for(float[][] rectA : n.childRectangles){
-            for(float[][] rectB : n.childRectangles){
-                if(rectA == rectB){
+        for(int i = 0; i < n.childRectangles.size(); i++){
+            float[][] rectA = n.childRectangles.get(i);
+            for(int j = 0; j < n.childRectangles.size(); j++){
+                float[][] rectB = n.childRectangles.get(j);
+                if(i <= j){
                     continue;
                 }
                 float areaA = nRectangle.area(rectA);
@@ -43,7 +50,7 @@ public class QuadraticSplit {
         return pairarray;
     }
 
-    private static Pair<float[][], Long> pickNext(Node n, ArrayList<float[][]> g1, ArrayList<float[][]> g2){
+    public static Pair<float[][], Long> pickNext(Node n, ArrayList<float[][]> g1, ArrayList<float[][]> g2){
         float[][] theRect = null;
         Long theId = null;
         float max = -1;
