@@ -131,9 +131,11 @@ public class RTree {
 				l.parent = this.root.myId;
 				ll.parent = this.root.myId;
 				// Actualizamos el padre de los hijos del nuevo nodo
-				for(Long f : ll.childIds){
-					Node child = memManager.loadNode(f);
-					child.parent = ll.myId;
+				if(!ll.isLeaf) {
+					for (Long f : ll.childIds) {
+						Node child = memManager.loadNode(f);
+						child.parent = ll.myId;
+					}
 				}
 				// Actualizo el MBR de la raiz
 				this.root.recalculateMBR();
@@ -163,9 +165,11 @@ public class RTree {
 				// Le damos un id al nodo nuevo
 				ll.setMyID(this.memManager.getNewId());
 				// Seteo el padre de los hijos del nuevo nodo
-				for(Long f : ll.childIds){
-					Node child = memManager.loadNode(f);
-					child.parent = ll.myId;
+				if(!ll.isLeaf) {
+					for (Long f : ll.childIds) {
+						Node child = memManager.loadNode(f);
+						child.parent = ll.myId;
+					}
 				}
 				memManager.insertNode(ll);
 				P.childRectangles.set(lIndex, l.coords);
