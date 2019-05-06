@@ -142,13 +142,13 @@ public class RTree {
 				// Guardamos los nodos nuevos en el buffer
 				memManager.insertNode(this.root);
 				memManager.insertNode(ll);
-				
+				memManager.insertNode(l);
 				return;
-
 			}
 			else{
 				// No hubo split de la raiz, solo se actualiza su MBR
 				l.recalculateMBR();
+				memManager.insertNode(l);
 				return;
 			}
 		}
@@ -160,6 +160,9 @@ public class RTree {
 			}
 			Node P = this.memManager.loadNode(l.parent);
 			int lIndex = P.childIds.indexOf(l.myId);
+			if(lIndex == -1) {
+				System.err.println("NOOOOOOOOOOOOOOO");
+			}
 			if(ll != null) {
 				// Hubo split de nodos, ambos vienen con su MBR ya calculado
 				// Le damos un id al nodo nuevo
@@ -172,10 +175,12 @@ public class RTree {
 					}
 				}
 				memManager.insertNode(ll);
+				memManager.insertNode(l);
 				P.childRectangles.set(lIndex, l.coords);
 				P.childRectangles.add(ll.coords);
 				P.childIds.add(ll.myId);
 				P.recalculateMBR();
+				memManager.insertNode(P);
 				if (P.childIds.size() > this.M) {
 					// El padre se llen�, hago split
 					Node[] parentSplits = splitNode(P);
@@ -187,6 +192,8 @@ public class RTree {
 				l.recalculateMBR();
 				P.childRectangles.set(lIndex, l.coords);
 				P.recalculateMBR();
+				memManager.insertNode(l);
+				memManager.insertNode(P);
 				return;
 			}
 		}

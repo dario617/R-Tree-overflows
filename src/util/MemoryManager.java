@@ -182,7 +182,7 @@ public class MemoryManager {
 		return n;
 	}
 
-	private Node loadFromMemory(long id) throws IOException, ClassNotFoundException {
+	public Node loadFromMemory(long id) throws IOException, ClassNotFoundException {
 		String filename = this.nodeDir + id + this.fileExtension;
 		FileInputStream fis = new FileInputStream(filename);
 		ObjectInputStream ois = new ObjectInputStream(fis);
@@ -209,6 +209,21 @@ public class MemoryManager {
 			}
 		}catch (Exception e) {
 			System.err.println("File not found");
+		}
+	}
+	
+	/**
+	 * Save all buffer values to secondary memory
+	 */
+	public void saveBuffer() {
+		try {
+			for(Entry<Long, Node> en : this.bufferedNodes.entrySet()) {
+				saveNode(en.getValue(), en.getKey());
+			}
+		}catch (Exception e) {
+			// TODO: handle exception
+			System.err.println("Problem saving all the buffer");
+			e.printStackTrace();
 		}
 	}
 	

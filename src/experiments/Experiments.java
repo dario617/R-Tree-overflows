@@ -25,10 +25,8 @@ public class Experiments {
 	private static void runSynteticExperiment(long exp, RTree.OverflowMethod overflow, int maxBuffered,
 			int nbRectangleSearch) {
 		try {
-			
-			
 			// Log on unique file
-			Logger logs = new Logger("./" + timeStamp + "-SynteticData-2^" + exp + ".txt",
+			Logger logs = new Logger("./" + timeStamp + "-SynteticData-2^" + exp + "-" + overflow + ".txt",
 					"SynteticData-2^" + exp, overflow.toString());
 
 			long nbRectangles = (long)Math.pow(2, exp);
@@ -37,6 +35,7 @@ public class Experiments {
 			rtree.setDebug(DEBUG);
 			ArrayList<float[][]> cachedRect = new ArrayList<float[][]>();
 
+			logs.startTest("OverallTest");
 			// ----- Insert test
 			logs.startTest("InsertTest");
 			for (long i = 0; i < (nbRectangles - (long) (nbRectangleSearch)); i++) {
@@ -73,8 +72,9 @@ public class Experiments {
 			long fullCriteria = (long)(pageSize*0.9);
 			long nbFullNodes = 0L; // Nodes close to pagesize
 			long tmp;
+			rtree.memManager.saveBuffer();
 			logs.startTest("Statistics");
-			for(long id = 0; id < rtree.memManager.createdNodes; id++) {
+			for(long id = 1; id < rtree.memManager.createdNodes; id++) {
 				tmp = rtree.memManager.getFileSizeAndDelete(id);
 				if(tmp == 0) {
 					requiredSpace-=pageSize; // Due to error on id innecessary increase
@@ -88,6 +88,8 @@ public class Experiments {
 			logs.logInfo("Statistics", "Number of full nodes "+nbFullNodes);
 			logs.stopTest("Statistics");
 
+			logs.stopTest("OverallTest");
+			
 			logs.close();
 		} catch (IOException e) {
 			System.err.println("Failed to initiate logger");
@@ -101,6 +103,7 @@ public class Experiments {
 			System.out.print("Inserting with Method ");
 			System.out.println(OverflowMethod.values()[o]);
 			for (int e = 9; e < 29; e++) {
+				System.out.println("Doing 2^" + e);
 				runSynteticExperiment(e, om[o], 10, 100);
 			}
 		}
