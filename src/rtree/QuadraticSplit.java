@@ -33,11 +33,14 @@ public class QuadraticSplit {
                 float areaB = nRectangle.area(rectB);
                 float areaC = nRectangle.area(nRectangle.MBR(rectA, rectB));
                 d = areaC - areaA - areaB;
+                if (d<0) {
+                	d = 0;
+                }
                 if(d > max){
                     rect1 = rectA;
                     rect2 = rectB;
-                    id1 = n.childIds.get(n.childRectangles.indexOf(rectA));
-                    id2 = n.childIds.get(n.childRectangles.indexOf(rectB));
+                    id1 = n.childIds.get(i);
+                    id2 = n.childIds.get(j);
                     max = d;
                 }
             }
