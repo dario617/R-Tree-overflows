@@ -1,10 +1,12 @@
 package experiments;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import rtree.RTree;
 import rtree.RTree.OverflowMethod;
+import util.MemoryManager;
 
 public class Experiments {
 
@@ -13,6 +15,15 @@ public class Experiments {
 	private static boolean DEBUG = false;
 	private static long timeStamp;
 
+	public static void deleteListFilesOnFolder(final File folder) {
+	    for (final File fileEntry : folder.listFiles()) {
+	        if (fileEntry.isDirectory()) {
+	        	deleteListFilesOnFolder(fileEntry);
+	        }
+	        fileEntry.delete();
+	    }
+	}
+	
 	/**
 	 * Runs Insertion, Page used space and Search tests using random rectangles.
 	 * Results are saved to secondary memory
@@ -82,9 +93,12 @@ public class Experiments {
 				if(tmp >= fullCriteria) {nbFullNodes++;}
 				totalSpaceUsed += tmp;
 			}
-			logs.logInfo("Statistics", "Total Data Size "+totalSpaceUsed+"Bytes");
-			logs.logInfo("Statistics", "Total Data Required Size "+requiredSpace+"Bytes");
+			logs.logInfo("Statistics", "Total Data Size "+totalSpaceUsed+"Bytes or " + 
+					MemoryManager.getFileSizeMegaBytes(totalSpaceUsed) + "MB");
+			logs.logInfo("Statistics", "Total Data Required Size "+requiredSpace+"Bytes or "+ 
+					MemoryManager.getFileSizeMegaBytes(requiredSpace) + "MB");
 			logs.logInfo("Statistics", "Page use ratio "+ totalSpaceUsed*100.0/requiredSpace+"%");
+			logs.logInfo("Statistics", "I/O ops"+rtree.memManager.diskAccess);
 			logs.logInfo("Statistics", "Number of full nodes "+nbFullNodes);
 			logs.stopTest("Statistics");
 
@@ -94,22 +108,39 @@ public class Experiments {
 		} catch (IOException e) {
 			System.err.println("Failed to initiate logger");
 			e.printStackTrace();
+			
+			
+		} catch (Exception e) {
+			System.err.println("Error somewhere, cleaning up");
+			e.printStackTrace();
+			deleteListFilesOnFolder(new File("./RTree/"));
 		}
 	}
 
 	private static void synteticDataExperiment() {
 		RTree.OverflowMethod[] om = { OverflowMethod.LINEAR, OverflowMethod.QUADRATIC };
-		for (int o = 0; o < om.length; o++) {
-			System.out.print("Inserting with Method ");
-			System.out.println(OverflowMethod.values()[o]);
-			for (int e = 9; e < 29; e++) {
-				System.out.println("Doing 2^" + e);
-				runSynteticExperiment(e, om[o], 10, 100);
+		for (int e = 9; e < 23; e++) {
+			for (int o = 0; o < om.length; o++) {
+				System.out.println(OverflowMethod.values()[o] + " Doing 2^" + e);
+				boolean running = true; 
+				while(running) {
+					runSynteticExperiment(e, om[o], 10, 100);
+					running = false;
+				}
 			}
 		}
 	}
 
-	public static void main(String[] args) {		
+	public static void main(String[] args) {
+		
+		Runtime.getRuntime().addShutdownHook( new Thread("app-shutdown-hook") {
+			@Override 
+			public void run() { 
+				System.out.println("Tear down, deleting orphaned nodes");
+				deleteListFilesOnFolder(new File("./RTree/"));
+		    }
+		});
+		
 		timeStamp = System.currentTimeMillis();
 		// Instantiate experiment tools
 		dg = new DatasetGenerator(1, 100, 2);

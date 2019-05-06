@@ -20,6 +20,7 @@ public class MemoryManager {
 
 	public long createdNodes;
 	public int loadedNodes;
+	public long diskAccess;
 	private HashMap<Long, Node> bufferedNodes;
 	private HashMap<Long, Long> nodeUpdated;
 	// Tree Maps sort a HashMap on a descending key value
@@ -36,6 +37,7 @@ public class MemoryManager {
 	public MemoryManager(int maxBufferedNodes) {
 		this.createdNodes = 1;
 		this.loadedNodes = 0;
+		this.diskAccess = 0;
 		this.maxBuffered = maxBufferedNodes;
 		this.bufferedNodes = new HashMap<Long, Node>();
 		this.nodeUpdated = new HashMap<Long, Long>();
@@ -93,6 +95,7 @@ public class MemoryManager {
 		fos.write(s);
 		fos.flush();
 		fos.close();
+		this.diskAccess++;
 	}
 
 	/**
@@ -107,6 +110,7 @@ public class MemoryManager {
 		ObjectOutputStream oos = new ObjectOutputStream(fos);
 		oos.writeObject(n);
 		oos.close();
+		this.diskAccess++;
 	}
 
 	/**
@@ -179,6 +183,7 @@ public class MemoryManager {
 		BufferedReader bf = new BufferedReader(new FileReader(filename));
 		String read = bf.readLine();
 		Node n = new Node(read);
+		this.diskAccess++;
 		return n;
 	}
 
@@ -192,6 +197,7 @@ public class MemoryManager {
 		}
 		fis.close();
 		ois.close();
+		this.diskAccess++;
 		return n;
 	}
 
@@ -256,23 +262,23 @@ public class MemoryManager {
 		String filename = this.nodeDir + id + this.fileExtension;
 		try {
 			File f = new File(filename);
-			System.out.println(getFileSizeBytes(f));
-			System.out.println(getFileSizeKiloBytes(f));
-			System.out.println(getFileSizeMegaBytes(f));
+			System.out.println(getFileSizeBytes(f.length()));
+			System.out.println(getFileSizeKiloBytes(f.length()));
+			System.out.println(getFileSizeMegaBytes(f.length()));
 		}catch (Exception e) {
 			System.err.println("File not found");
 		}
 	}
 	
-	private static String getFileSizeMegaBytes(File file) {
-		return (double) file.length() / (1024 * 1024) + " mb";
+	public static String getFileSizeMegaBytes(long length) {
+		return (double) length / (1024 * 1024) + " mb";
 	}
 	
-	private static String getFileSizeKiloBytes(File file) {
-		return (double) file.length() / 1024 + "  kb";
+	public static String getFileSizeKiloBytes(long length) {
+		return (double) length / 1024 + "  kb";
 	}
 
-	private static String getFileSizeBytes(File file) {
-		return file.length() + " bytes";
+	public static String getFileSizeBytes(long length) {
+		return length + " bytes";
 	}
 }

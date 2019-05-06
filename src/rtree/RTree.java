@@ -112,7 +112,7 @@ public class RTree {
 	 */
 	private void adjustTree(Node l, Node ll) throws IOException, ClassNotFoundException {
 		assert(l!=null) : "Null pointer to first node to adjust!";
-		if(l == this.root){
+		if(l.myId == this.root.myId){
 			// La raiz se partio en dos partes
 			if(ll != null){
 				// Generamos una nueva ra�z
