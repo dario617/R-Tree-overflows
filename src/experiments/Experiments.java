@@ -107,25 +107,25 @@ public class Experiments {
 			logs.close();
 		} catch (IOException e) {
 			System.err.println("Failed to initiate logger");
-			e.printStackTrace();
-			
-			
-		} catch (Exception e) {
-			System.err.println("Error somewhere, cleaning up");
-			e.printStackTrace();
-			deleteListFilesOnFolder(new File("./RTree/"));
+			e.printStackTrace();	
 		}
 	}
 
 	private static void synteticDataExperiment() {
 		RTree.OverflowMethod[] om = { OverflowMethod.LINEAR, OverflowMethod.QUADRATIC };
-		for (int e = 9; e < 23; e++) {
+		for (int e = 9; e < 26; e++) {
 			for (int o = 0; o < om.length; o++) {
 				System.out.println(OverflowMethod.values()[o] + " Doing 2^" + e);
 				boolean running = true; 
 				while(running) {
-					runSynteticExperiment(e, om[o], 10, 100);
-					running = false;
+					try {
+						runSynteticExperiment(e, om[o], 10, 100);
+						running = false;
+					}catch (Exception exc) {
+						System.err.println("Error somewhere, cleaning up");
+						exc.printStackTrace();
+						deleteListFilesOnFolder(new File("./RTree/"));
+					}
 				}
 			}
 		}
