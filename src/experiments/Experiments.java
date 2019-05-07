@@ -33,8 +33,7 @@ public class Experiments {
 	 * @param maxBuffered       nodes to keep on memory
 	 * @param nbRectangleSearch rectangles to search on RTree
 	 */
-	private static void runSynteticExperiment(long exp, RTree.OverflowMethod overflow, int maxBuffered,
-			int nbRectangleSearch) {
+	private static void runSynteticExperiment(long exp, RTree.OverflowMethod overflow, int maxBuffered) {
 		try {
 			// Log on unique file
 			Logger logs = new Logger("./" + timeStamp + "-SynteticData-2^" + exp + "-" + overflow + ".txt",
@@ -49,32 +48,18 @@ public class Experiments {
 			logs.startTest("OverallTest");
 			// ----- Insert test
 			logs.startTest("InsertTest");
-			for (long i = 0; i < (nbRectangles - (long) (nbRectangleSearch)); i++) {
+			for (long i = 0; i < nbRectangles; i++) {
 				rtree.insertRect(dg.getNewRectangle());
-			}
-			// Insert Test - positive search results
-			for (long i = 0; i < nbRectangleSearch; i++) {
-				float[][] ref = dg.getNewRectangle();
-				rtree.insertRect(ref);
-				cachedRect.add(ref);
 			}
 			logs.stopTest("InsertTest");
 
 			// ----- Search test
 			logs.startTest("Search");
+			rtree.memManager.diskAccess = 0;
 			// Negative results
-			logs.startTest("NegativeResults");
-			for (int i = 0; i < nbRectangleSearch; i++) {
+			for (int i = 0; i < nbRectangles/10; i++) {
 				rtree.search(dg.getNewRectangle());
 			}
-			logs.stopTest("NegativeResults");
-
-			// Positive results
-			logs.startTest("PositiveResults");
-			for (int i = 0; i < nbRectangleSearch; i++) {
-				rtree.search(cachedRect.get(i));
-			}
-			logs.stopTest("PositiveResults");
 			logs.stopTest("Search");
 			
 			// ----- Get page average used space
@@ -112,6 +97,10 @@ public class Experiments {
 	}
 
 	private static void synteticDataExperiment() {
+		
+		//int bufferSize = (int)Math.pow(2, 25);
+		int bufferSize = 10;
+		
 		RTree.OverflowMethod[] om = { OverflowMethod.LINEAR, OverflowMethod.QUADRATIC };
 		for (int e = 9; e < 26; e++) {
 			for (int o = 0; o < om.length; o++) {
@@ -119,7 +108,7 @@ public class Experiments {
 				boolean running = true; 
 				while(running) {
 					try {
-						runSynteticExperiment(e, om[o], 10, 100);
+						runSynteticExperiment(e, om[o], bufferSize);
 						running = false;
 					}catch (Exception exc) {
 						System.err.println("Error somewhere, cleaning up");
