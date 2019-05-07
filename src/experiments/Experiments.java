@@ -60,6 +60,7 @@ public class Experiments {
 			for (int i = 0; i < nbRectangles/10; i++) {
 				rtree.search(dg.getNewRectangle());
 			}
+			logs.logInfo("Statistics", "I/O ops"+rtree.memManager.diskAccess);
 			logs.stopTest("Search");
 			
 			// ----- Get page average used space
@@ -83,7 +84,6 @@ public class Experiments {
 			logs.logInfo("Statistics", "Total Data Required Size "+requiredSpace+"Bytes or "+ 
 					MemoryManager.getFileSizeMegaBytes(requiredSpace) + "MB");
 			logs.logInfo("Statistics", "Page use ratio "+ totalSpaceUsed*100.0/requiredSpace+"%");
-			logs.logInfo("Statistics", "I/O ops"+rtree.memManager.diskAccess);
 			logs.logInfo("Statistics", "Number of full nodes "+nbFullNodes);
 			logs.stopTest("Statistics");
 
@@ -109,6 +109,7 @@ public class Experiments {
 				while(running) {
 					try {
 						runSynteticExperiment(e, om[o], bufferSize);
+						deleteListFilesOnFolder(new File("./RTree/"));
 						running = false;
 					}catch (Exception exc) {
 						System.err.println("Error somewhere, cleaning up");
